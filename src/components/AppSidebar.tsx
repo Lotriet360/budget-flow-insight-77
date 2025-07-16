@@ -2,10 +2,10 @@
 import { 
   BarChart3, 
   TrendingUp, 
+  TrendingDown,
   CreditCard, 
-  Menu,
-  DollarSign,
-  PiggyBank 
+  PiggyBank,
+  DollarSign 
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -24,12 +24,14 @@ import {
 
 const items = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
-  { title: "Income & Expenses", url: "/income-expense", icon: TrendingUp },
+  { title: "Income", url: "/income", icon: TrendingUp },
+  { title: "Expenses", url: "/expenses", icon: TrendingDown },
+  { title: "Savings & Investment", url: "/savings", icon: PiggyBank },
   { title: "Debt Tracker", url: "/debt-tracker", icon: CreditCard },
 ];
 
 export function AppSidebar() {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -37,15 +39,17 @@ export function AppSidebar() {
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive ? "bg-blue-100 text-blue-700 font-medium border-r-2 border-blue-500" : "hover:bg-gray-100 text-gray-700";
 
+  const collapsed = state === "collapsed";
+
   return (
     <Sidebar
       className={`${collapsed ? "w-16" : "w-64"} border-r border-gray-200 bg-white`}
-      collapsible
+      collapsible="icon"
     >
       <SidebarHeader className="p-4 border-b border-gray-200">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <PiggyBank className="w-5 h-5 text-white" />
+            <DollarSign className="w-5 h-5 text-white" />
           </div>
           {!collapsed && (
             <div>

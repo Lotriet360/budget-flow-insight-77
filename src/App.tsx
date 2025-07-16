@@ -7,7 +7,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import Dashboard from "./pages/Dashboard";
-import IncomeExpense from "./pages/IncomeExpense";
+import Income from "./pages/Income";
+import Expenses from "./pages/Expenses";
+import Savings from "./pages/Savings";
 import DebtTracker from "./pages/DebtTracker";
 import NotFound from "./pages/NotFound";
 
@@ -25,7 +27,9 @@ const App = () => (
             <main className="flex-1 overflow-auto">
               <Routes>
                 <Route path="/" element={<Dashboard />} />
-                <Route path="/income-expense" element={<IncomeExpense />} />
+                <Route path="/income" element={<Income />} />
+                <Route path="/expenses" element={<Expenses />} />
+                <Route path="/savings" element={<Savings />} />
                 <Route path="/debt-tracker" element={<DebtTracker />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
