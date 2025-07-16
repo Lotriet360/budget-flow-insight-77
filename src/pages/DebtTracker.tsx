@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Plus, DollarSign, Calendar, TrendingDown, AlertCircle } from "lucide-react";
+import { Plus, DollarSign, Calendar, TrendingDown, Edit2, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface Debt {
@@ -58,22 +58,10 @@ const DebtTracker = () => {
       payments: [
         { id: '3', amount: 300, date: '2024-01-20', note: 'Monthly payment' }
       ]
-    },
-    {
-      id: '3',
-      name: 'Car Loan',
-      type: 'Auto Loan',
-      originalAmount: 20000,
-      currentBalance: 12800,
-      interestRate: 4.2,
-      minPayment: 350,
-      dueDate: '2024-02-10',
-      payments: [
-        { id: '4', amount: 350, date: '2024-01-10', note: 'Monthly payment' }
-      ]
     }
   ]);
 
+  const [editingDebt, setEditingDebt] = useState<Debt | null>(null);
   const [newDebt, setNewDebt] = useState({
     name: '',
     type: '',
@@ -124,6 +112,39 @@ const DebtTracker = () => {
     }
   };
 
+  const handleEditDebt = () => {
+    if (editingDebt && editingDebt.name && editingDebt.type) {
+      setDebts(debts.map(debt => 
+        debt.id === editingDebt.id ? editingDebt : debt
+      ));
+      setEditingDebt(null);
+      setIsDebtDialogOpen(false);
+    }
+  };
+
+  const handleDeleteDebt = (id: string) => {
+    setDebts(debts.filter(debt => debt.id !== id));
+  };
+
+  const openEditDebtDialog = (debt: Debt) => {
+    setEditingDebt(debt);
+    setIsDebtDialogOpen(true);
+  };
+
+  const openAddDebtDialog = () => {
+    setEditingDebt(null);
+    setNewDebt({
+      name: '',
+      type: '',
+      originalAmount: '',
+      currentBalance: '',
+      interestRate: '',
+      minPayment: '',
+      dueDate: ''
+    });
+    setIsDebtDialogOpen(true);
+  };
+
   const handleAddPayment = () => {
     if (selectedDebt && newPayment.amount) {
       const payment: Payment = {
@@ -138,7 +159,7 @@ const DebtTracker = () => {
           ? { 
               ...debt, 
               payments: [...debt.payments, payment],
-              currentBalance: debt.currentBalance - payment.amount
+              currentBalance: Math.max(0, debt.currentBalance - payment.amount)
             }
           : debt
       ));
@@ -170,8 +191,10 @@ const DebtTracker = () => {
     return diffDays;
   };
 
+  const isEditingDebt = !!editingDebt;
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted/30">
       <PageHeader 
         title="Debt Tracker" 
         subtitle="Monitor your debts and track payments"
@@ -180,51 +203,51 @@ const DebtTracker = () => {
       <div className="p-6 space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Debt</CardTitle>
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Debt</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">${totalDebt.toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1">
+              <div className="text-3xl font-bold text-financial-debt">${totalDebt.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">
                 Across {debts.length} accounts
               </p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Paid</CardTitle>
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Paid</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">${totalPaid.toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1">
-                {((totalPaid / totalOriginalDebt) * 100).toFixed(1)}% of original debt
+              <div className="text-3xl font-bold text-financial-income">${totalPaid.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {totalOriginalDebt > 0 ? ((totalPaid / totalOriginalDebt) * 100).toFixed(1) : 0}% of original debt
               </p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Min Monthly Payments</CardTitle>
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Min Monthly Payments</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">${totalMinPayments.toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1">
+              <div className="text-3xl font-bold text-primary">${totalMinPayments.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">
                 Minimum required
               </p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Progress</CardTitle>
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Progress</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-600">
-                {((totalPaid / totalOriginalDebt) * 100).toFixed(1)}%
+              <div className="text-3xl font-bold text-financial-investment">
+                {totalOriginalDebt > 0 ? ((totalPaid / totalOriginalDebt) * 100).toFixed(1) : 0}%
               </div>
-              <Progress value={(totalPaid / totalOriginalDebt) * 100} className="mt-2" />
+              <Progress value={totalOriginalDebt > 0 ? (totalPaid / totalOriginalDebt) * 100 : 0} className="mt-2" />
             </CardContent>
           </Card>
         </div>
@@ -233,14 +256,14 @@ const DebtTracker = () => {
         <div className="flex gap-4">
           <Dialog open={isDebtDialogOpen} onOpenChange={setIsDebtDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={openAddDebtDialog} className="bg-primary hover:bg-primary/90 shadow-sm">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Debt
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Add New Debt</DialogTitle>
+                <DialogTitle>{isEditingDebt ? 'Edit Debt' : 'Add New Debt'}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
@@ -248,14 +271,25 @@ const DebtTracker = () => {
                   <Input
                     id="name"
                     placeholder="e.g., Credit Card - Visa"
-                    value={newDebt.name}
-                    onChange={(e) => setNewDebt({...newDebt, name: e.target.value})}
+                    value={isEditingDebt ? editingDebt?.name : newDebt.name}
+                    onChange={(e) => 
+                      isEditingDebt 
+                        ? setEditingDebt(prev => prev ? {...prev, name: e.target.value} : null)
+                        : setNewDebt({...newDebt, name: e.target.value})
+                    }
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="type">Type</Label>
-                  <Select value={newDebt.type} onValueChange={(value) => setNewDebt({...newDebt, type: value})}>
+                  <Select 
+                    value={isEditingDebt ? editingDebt?.type : newDebt.type} 
+                    onValueChange={(value) => 
+                      isEditingDebt 
+                        ? setEditingDebt(prev => prev ? {...prev, type: value} : null)
+                        : setNewDebt({...newDebt, type: value})
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select debt type" />
                     </SelectTrigger>
@@ -274,8 +308,12 @@ const DebtTracker = () => {
                       id="originalAmount"
                       type="number"
                       placeholder="0.00"
-                      value={newDebt.originalAmount}
-                      onChange={(e) => setNewDebt({...newDebt, originalAmount: e.target.value})}
+                      value={isEditingDebt ? editingDebt?.originalAmount : newDebt.originalAmount}
+                      onChange={(e) => 
+                        isEditingDebt 
+                          ? setEditingDebt(prev => prev ? {...prev, originalAmount: parseFloat(e.target.value) || 0} : null)
+                          : setNewDebt({...newDebt, originalAmount: e.target.value})
+                      }
                     />
                   </div>
                   <div>
@@ -284,8 +322,12 @@ const DebtTracker = () => {
                       id="currentBalance"
                       type="number"
                       placeholder="0.00"
-                      value={newDebt.currentBalance}
-                      onChange={(e) => setNewDebt({...newDebt, currentBalance: e.target.value})}
+                      value={isEditingDebt ? editingDebt?.currentBalance : newDebt.currentBalance}
+                      onChange={(e) => 
+                        isEditingDebt 
+                          ? setEditingDebt(prev => prev ? {...prev, currentBalance: parseFloat(e.target.value) || 0} : null)
+                          : setNewDebt({...newDebt, currentBalance: e.target.value})
+                      }
                     />
                   </div>
                 </div>
@@ -297,8 +339,12 @@ const DebtTracker = () => {
                       id="interestRate"
                       type="number"
                       placeholder="0.00"
-                      value={newDebt.interestRate}
-                      onChange={(e) => setNewDebt({...newDebt, interestRate: e.target.value})}
+                      value={isEditingDebt ? editingDebt?.interestRate : newDebt.interestRate}
+                      onChange={(e) => 
+                        isEditingDebt 
+                          ? setEditingDebt(prev => prev ? {...prev, interestRate: parseFloat(e.target.value) || 0} : null)
+                          : setNewDebt({...newDebt, interestRate: e.target.value})
+                      }
                     />
                   </div>
                   <div>
@@ -307,8 +353,12 @@ const DebtTracker = () => {
                       id="minPayment"
                       type="number"
                       placeholder="0.00"
-                      value={newDebt.minPayment}
-                      onChange={(e) => setNewDebt({...newDebt, minPayment: e.target.value})}
+                      value={isEditingDebt ? editingDebt?.minPayment : newDebt.minPayment}
+                      onChange={(e) => 
+                        isEditingDebt 
+                          ? setEditingDebt(prev => prev ? {...prev, minPayment: parseFloat(e.target.value) || 0} : null)
+                          : setNewDebt({...newDebt, minPayment: e.target.value})
+                      }
                     />
                   </div>
                 </div>
@@ -318,13 +368,20 @@ const DebtTracker = () => {
                   <Input
                     id="dueDate"
                     type="date"
-                    value={newDebt.dueDate}
-                    onChange={(e) => setNewDebt({...newDebt, dueDate: e.target.value})}
+                    value={isEditingDebt ? editingDebt?.dueDate : newDebt.dueDate}
+                    onChange={(e) => 
+                      isEditingDebt 
+                        ? setEditingDebt(prev => prev ? {...prev, dueDate: e.target.value} : null)
+                        : setNewDebt({...newDebt, dueDate: e.target.value})
+                    }
                   />
                 </div>
 
-                <Button onClick={handleAddDebt} className="w-full">
-                  Add Debt
+                <Button 
+                  onClick={isEditingDebt ? handleEditDebt : handleAddDebt} 
+                  className="w-full"
+                >
+                  {isEditingDebt ? 'Update Debt' : 'Add Debt'}
                 </Button>
               </div>
             </DialogContent>
@@ -338,13 +395,31 @@ const DebtTracker = () => {
             const daysUntilDue = getDaysUntilDue(debt.dueDate);
             
             return (
-              <Card key={debt.id} className="hover:shadow-md transition-shadow">
+              <Card key={debt.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{debt.name}</CardTitle>
-                    <Badge variant="outline">{debt.type}</Badge>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openEditDebtDialog(debt)}
+                        className="text-primary hover:text-primary/80"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteDebt(debt.id)}
+                        className="text-financial-expense hover:text-financial-expense/80"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <Badge variant="outline" className="w-fit">{debt.type}</Badge>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <DollarSign className="w-4 h-4" />
                       {debt.interestRate}% APR
@@ -359,22 +434,22 @@ const DebtTracker = () => {
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm font-medium">Progress</span>
-                      <span className="text-sm text-gray-600">{progress.toFixed(1)}%</span>
+                      <span className="text-sm text-muted-foreground">{progress.toFixed(1)}%</span>
                     </div>
                     <Progress value={progress} className="h-2" />
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Current Balance</span>
-                      <span className="font-semibold text-red-600">${debt.currentBalance.toLocaleString()}</span>
+                      <span className="text-sm text-muted-foreground">Current Balance</span>
+                      <span className="font-semibold text-financial-debt">${debt.currentBalance.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Original Amount</span>
+                      <span className="text-sm text-muted-foreground">Original Amount</span>
                       <span className="font-semibold">${debt.originalAmount.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Min Payment</span>
+                      <span className="text-sm text-muted-foreground">Min Payment</span>
                       <span className="font-semibold">${debt.minPayment.toLocaleString()}</span>
                     </div>
                   </div>
@@ -382,12 +457,12 @@ const DebtTracker = () => {
                   <div className="pt-4 border-t">
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm font-medium">Recent Payments</span>
-                      <span className="text-xs text-gray-500">{debt.payments.length} total</span>
+                      <span className="text-xs text-muted-foreground">{debt.payments.length} total</span>
                     </div>
                     {debt.payments.slice(-2).map((payment) => (
                       <div key={payment.id} className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600">{new Date(payment.date).toLocaleDateString()}</span>
-                        <span className="font-medium text-green-600">${payment.amount.toLocaleString()}</span>
+                        <span className="text-muted-foreground">{new Date(payment.date).toLocaleDateString()}</span>
+                        <span className="font-medium text-financial-income">${payment.amount.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
@@ -410,7 +485,7 @@ const DebtTracker = () => {
 
         {/* Payment Dialog */}
         <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Record Payment</DialogTitle>
             </DialogHeader>

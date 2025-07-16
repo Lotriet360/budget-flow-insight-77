@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, PiggyBank, TrendingUp, Calendar } from "lucide-react";
+import { Plus, Trash2, PiggyBank, Calendar, Edit2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -46,6 +46,7 @@ const Savings = () => {
     }
   ]);
 
+  const [editingItem, setEditingItem] = useState<SavingsItem | null>(null);
   const [newItem, setNewItem] = useState({
     type: 'savings' as 'savings' | 'investment',
     category: '',
@@ -87,8 +88,36 @@ const Savings = () => {
     }
   };
 
+  const handleEditItem = () => {
+    if (editingItem && editingItem.category && editingItem.amount && editingItem.target) {
+      setSavingsItems(savingsItems.map(item => 
+        item.id === editingItem.id ? editingItem : item
+      ));
+      setEditingItem(null);
+      setIsDialogOpen(false);
+    }
+  };
+
   const handleDeleteItem = (id: string) => {
     setSavingsItems(savingsItems.filter(item => item.id !== id));
+  };
+
+  const openEditDialog = (item: SavingsItem) => {
+    setEditingItem(item);
+    setIsDialogOpen(true);
+  };
+
+  const openAddDialog = () => {
+    setEditingItem(null);
+    setNewItem({
+      type: 'savings',
+      category: '',
+      amount: '',
+      target: '',
+      description: '',
+      date: new Date().toISOString().split('T')[0]
+    });
+    setIsDialogOpen(true);
   };
 
   const filteredItems = savingsItems.filter(item => {
@@ -102,8 +131,10 @@ const Savings = () => {
   const investmentTotal = filteredItems.filter(item => item.type === 'investment').reduce((sum, item) => sum + item.amount, 0);
   const totalTargets = filteredItems.reduce((sum, item) => sum + item.target, 0);
 
+  const isEditing = !!editingItem;
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted/30">
       <PageHeader 
         title="Savings & Investment" 
         subtitle="Track your savings goals and investment portfolio"
@@ -112,51 +143,43 @@ const Savings = () => {
       <div className="p-6 space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Savings</CardTitle>
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Savings</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">${savingsTotal.toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1">
-                Saved amount
-              </p>
+              <div className="text-3xl font-bold text-financial-savings">${savingsTotal.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">Saved amount</p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Investments</CardTitle>
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Investments</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">${investmentTotal.toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1">
-                Invested amount
-              </p>
+              <div className="text-3xl font-bold text-financial-investment">${investmentTotal.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">Invested amount</p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Portfolio</CardTitle>
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Portfolio</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-600">${(savingsTotal + investmentTotal).toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1">
-                Combined value
-              </p>
+              <div className="text-3xl font-bold text-primary">${(savingsTotal + investmentTotal).toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">Combined value</p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Target Goals</CardTitle>
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Target Goals</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">${totalTargets.toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1">
-                Total targets
-              </p>
+              <div className="text-3xl font-bold text-financial-debt">${totalTargets.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">Total targets</p>
             </CardContent>
           </Card>
         </div>
@@ -169,7 +192,7 @@ const Savings = () => {
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-[240px] justify-start text-left font-normal",
+                    "w-[240px] justify-start text-left font-normal border-0 shadow-sm",
                     !dateFrom && "text-muted-foreground"
                   )}
                 >
@@ -193,7 +216,7 @@ const Savings = () => {
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-[240px] justify-start text-left font-normal",
+                    "w-[240px] justify-start text-left font-normal border-0 shadow-sm",
                     !dateTo && "text-muted-foreground"
                   )}
                 >
@@ -215,19 +238,26 @@ const Savings = () => {
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={openAddDialog} className="bg-primary hover:bg-primary/90 shadow-sm">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Item
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Add New Savings/Investment</DialogTitle>
+                <DialogTitle>{isEditing ? 'Edit Savings/Investment' : 'Add New Savings/Investment'}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="type">Type</Label>
-                  <Select value={newItem.type} onValueChange={(value: 'savings' | 'investment') => setNewItem({...newItem, type: value})}>
+                  <Select 
+                    value={isEditing ? editingItem?.type : newItem.type} 
+                    onValueChange={(value: 'savings' | 'investment') => 
+                      isEditing 
+                        ? setEditingItem(prev => prev ? {...prev, type: value} : null)
+                        : setNewItem({...newItem, type: value})
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -240,12 +270,19 @@ const Savings = () => {
 
                 <div>
                   <Label htmlFor="category">Category</Label>
-                  <Select value={newItem.category} onValueChange={(value) => setNewItem({...newItem, category: value})}>
+                  <Select 
+                    value={isEditing ? editingItem?.category : newItem.category} 
+                    onValueChange={(value) => 
+                      isEditing 
+                        ? setEditingItem(prev => prev ? {...prev, category: value} : null)
+                        : setNewItem({...newItem, category: value})
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {(newItem.type === 'savings' ? savingsCategories : investmentCategories).map(cat => (
+                      {((isEditing ? editingItem?.type : newItem.type) === 'savings' ? savingsCategories : investmentCategories).map(cat => (
                         <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                       ))}
                     </SelectContent>
@@ -259,8 +296,12 @@ const Savings = () => {
                       id="amount"
                       type="number"
                       placeholder="0.00"
-                      value={newItem.amount}
-                      onChange={(e) => setNewItem({...newItem, amount: e.target.value})}
+                      value={isEditing ? editingItem?.amount : newItem.amount}
+                      onChange={(e) => 
+                        isEditing 
+                          ? setEditingItem(prev => prev ? {...prev, amount: parseFloat(e.target.value) || 0} : null)
+                          : setNewItem({...newItem, amount: e.target.value})
+                      }
                     />
                   </div>
                   <div>
@@ -269,8 +310,12 @@ const Savings = () => {
                       id="target"
                       type="number"
                       placeholder="0.00"
-                      value={newItem.target}
-                      onChange={(e) => setNewItem({...newItem, target: e.target.value})}
+                      value={isEditing ? editingItem?.target : newItem.target}
+                      onChange={(e) => 
+                        isEditing 
+                          ? setEditingItem(prev => prev ? {...prev, target: parseFloat(e.target.value) || 0} : null)
+                          : setNewItem({...newItem, target: e.target.value})
+                      }
                     />
                   </div>
                 </div>
@@ -280,8 +325,12 @@ const Savings = () => {
                   <Input
                     id="description"
                     placeholder="Description"
-                    value={newItem.description}
-                    onChange={(e) => setNewItem({...newItem, description: e.target.value})}
+                    value={isEditing ? editingItem?.description : newItem.description}
+                    onChange={(e) => 
+                      isEditing 
+                        ? setEditingItem(prev => prev ? {...prev, description: e.target.value} : null)
+                        : setNewItem({...newItem, description: e.target.value})
+                    }
                   />
                 </div>
 
@@ -290,13 +339,20 @@ const Savings = () => {
                   <Input
                     id="date"
                     type="date"
-                    value={newItem.date}
-                    onChange={(e) => setNewItem({...newItem, date: e.target.value})}
+                    value={isEditing ? editingItem?.date : newItem.date}
+                    onChange={(e) => 
+                      isEditing 
+                        ? setEditingItem(prev => prev ? {...prev, date: e.target.value} : null)
+                        : setNewItem({...newItem, date: e.target.value})
+                    }
                   />
                 </div>
 
-                <Button onClick={handleAddItem} className="w-full">
-                  Add Item
+                <Button 
+                  onClick={isEditing ? handleEditItem : handleAddItem} 
+                  className="w-full"
+                >
+                  {isEditing ? 'Update Item' : 'Add Item'}
                 </Button>
               </div>
             </DialogContent>
@@ -304,48 +360,58 @@ const Savings = () => {
         </div>
 
         {/* Savings & Investment Items */}
-        <Card>
+        <Card className="border-0 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <PiggyBank className="w-5 h-5 text-green-600" />
+              <PiggyBank className="w-5 h-5 text-financial-savings" />
               Savings & Investment Items
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {filteredItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg hover:shadow-sm transition-shadow">
+                <div key={item.id} className="flex items-center justify-between p-4 border border-border rounded-xl hover:shadow-sm transition-all bg-card">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-medium">{item.category}</h3>
-                      <Badge variant="outline" className={item.type === 'savings' ? 'text-green-600 border-green-600' : 'text-blue-600 border-blue-600'}>
+                      <h3 className="font-semibold">{item.category}</h3>
+                      <Badge variant="outline" className={item.type === 'savings' ? 'text-financial-savings border-financial-savings/20 bg-financial-savings/10' : 'text-financial-investment border-financial-investment/20 bg-financial-investment/10'}>
                         {item.type === 'savings' ? 'Savings' : 'Investment'}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-600">{item.description}</p>
-                    <p className="text-xs text-gray-500">{new Date(item.date).toLocaleDateString()}</p>
+                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleDateString()}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-gray-900">${item.amount.toLocaleString()}</p>
-                    <p className="text-sm text-gray-500">Target: ${item.target.toLocaleString()}</p>
-                    <div className="w-32 bg-gray-200 rounded-full h-2 mt-1">
+                    <p className="font-bold text-foreground">${item.amount.toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">Target: ${item.target.toLocaleString()}</p>
+                    <div className="w-32 bg-muted rounded-full h-2 mt-2">
                       <div 
-                        className="bg-green-600 h-2 rounded-full" 
+                        className={`h-2 rounded-full ${item.type === 'savings' ? 'bg-financial-savings' : 'bg-financial-investment'}`}
                         style={{ width: `${Math.min((item.amount / item.target) * 100, 100)}%` }}
                       ></div>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {((item.amount / item.target) * 100).toFixed(1)}% complete
                     </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteItem(item.id)}
-                    className="ml-2 text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <div className="flex gap-1 ml-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEditDialog(item)}
+                      className="text-primary hover:text-primary/80"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteItem(item.id)}
+                      className="text-financial-expense hover:text-financial-expense/80"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

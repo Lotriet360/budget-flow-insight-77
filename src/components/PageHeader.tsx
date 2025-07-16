@@ -8,12 +8,12 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle }: PageHeaderProps) {
   return (
-    <div className="bg-white border-b border-gray-200 px-6 py-4">
+    <div className="bg-card border-b border-border px-6 py-6">
       <div className="flex items-center gap-4">
-        <SidebarTrigger className="hover:bg-gray-100 p-2 rounded-lg" />
+        <SidebarTrigger className="hover:bg-accent p-2 rounded-lg transition-colors" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-          {subtitle && <p className="text-gray-600">{subtitle}</p>}
+          <h1 className="text-3xl font-semibold text-foreground">{title}</h1>
+          {subtitle && <p className="text-muted-foreground mt-1">{subtitle}</p>}
         </div>
       </div>
     </div>
