@@ -12,6 +12,7 @@ import Expenses from "./pages/Expenses";
 import Savings from "./pages/Savings";
 import DebtTracker from "./pages/DebtTracker";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
 
@@ -26,7 +27,8 @@ const App = () => (
             <AppSidebar />
             <main className="flex-1 overflow-auto">
               <Routes>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Login />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/income" element={<Income />} />
                 <Route path="/expenses" element={<Expenses />} />
                 <Route path="/savings" element={<Savings />} />

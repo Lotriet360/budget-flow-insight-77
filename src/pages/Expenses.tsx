@@ -20,6 +20,7 @@ interface ExpenseItem {
   planned: number;
   description: string;
   date: string;
+  account: string;
 }
 
 const Expenses = () => {
@@ -30,7 +31,8 @@ const Expenses = () => {
       amount: 1200,
       planned: 1200,
       description: 'Rent payment',
-      date: '2024-01-01'
+      date: '2024-01-01',
+      account: ""
     },
     {
       id: '2',
@@ -38,7 +40,8 @@ const Expenses = () => {
       amount: 650,
       planned: 500,
       description: 'Groceries and dining',
-      date: '2024-01-05'
+      date: '2024-01-05',
+      account: ""
     }
   ]);
 
@@ -48,7 +51,8 @@ const Expenses = () => {
     amount: '',
     planned: '',
     description: '',
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split('T')[0],
+    account: '' // ✅ Add this
   });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -56,7 +60,6 @@ const Expenses = () => {
   const [dateTo, setDateTo] = useState<Date>();
 
   const expenseCategories = ['Housing', 'Food', 'Transportation', 'Entertainment', 'Utilities', 'Healthcare', 'Shopping', 'Other'];
-
   const clearFilters = () => {
     setDateFrom(undefined);
     setDateTo(undefined);
@@ -72,15 +75,17 @@ const Expenses = () => {
         amount: parseFloat(newItem.amount) || 0,
         planned: parseFloat(newItem.planned) || 0,
         description: newItem.description,
-        date: newItem.date
+        date: newItem.date,
+        account: newItem.account
       };
-      
+
       setExpenseItems([...expenseItems, item]);
       setNewItem({
         category: '',
         amount: '',
         planned: '',
         description: '',
+        account:'',
         date: new Date().toISOString().split('T')[0]
       });
       setIsDialogOpen(false);
@@ -89,7 +94,7 @@ const Expenses = () => {
 
   const handleEditItem = () => {
     if (editingItem && editingItem.category && (editingItem.amount || editingItem.planned)) {
-      setExpenseItems(expenseItems.map(item => 
+      setExpenseItems(expenseItems.map(item =>
         item.id === editingItem.id ? editingItem : item
       ));
       setEditingItem(null);
@@ -113,6 +118,7 @@ const Expenses = () => {
       amount: '',
       planned: '',
       description: '',
+      account:'',
       date: new Date().toISOString().split('T')[0]
     });
     setIsDialogOpen(true);
@@ -130,13 +136,10 @@ const Expenses = () => {
 
   const isEditing = !!editingItem;
 
-  return (
+    return (
     <div className="min-h-screen bg-muted/30">
-      <PageHeader 
-        title="Expenses" 
-        subtitle="Track your planned vs actual expenses"
-      />
-      
+      <PageHeader title="Expenses" subtitle="Track your planned vs actual expenses" />
+
       <div className="p-6 space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -175,30 +178,21 @@ const Expenses = () => {
           </Card>
         </div>
 
-        {/* Date Filters and Add Button */}
+        {/* Filters and Add Button */}
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
           <div className="flex gap-2 items-center">
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={cn(
-                    "w-[240px] justify-start text-left font-normal border-0 shadow-sm",
-                    !dateFrom && "text-muted-foreground"
-                  )}
+                  className={cn("w-[240px] justify-start text-left font-normal border-0 shadow-sm", !dateFrom && "text-muted-foreground")}
                 >
                   <Calendar className="mr-2 h-4 w-4" />
                   {dateFrom ? format(dateFrom, "PPP") : <span>From date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={dateFrom}
-                  onSelect={setDateFrom}
-                  initialFocus
-                  className="p-3 pointer-events-auto"
-                />
+                <CalendarComponent mode="single" selected={dateFrom} onSelect={setDateFrom} initialFocus className="p-3 pointer-events-auto" />
               </PopoverContent>
             </Popover>
 
@@ -206,33 +200,19 @@ const Expenses = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={cn(
-                    "w-[240px] justify-start text-left font-normal border-0 shadow-sm",
-                    !dateTo && "text-muted-foreground"
-                  )}
+                  className={cn("w-[240px] justify-start text-left font-normal border-0 shadow-sm", !dateTo && "text-muted-foreground")}
                 >
                   <Calendar className="mr-2 h-4 w-4" />
                   {dateTo ? format(dateTo, "PPP") : <span>To date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={dateTo}
-                  onSelect={setDateTo}
-                  initialFocus
-                  className="p-3 pointer-events-auto"
-                />
+                <CalendarComponent mode="single" selected={dateTo} onSelect={setDateTo} initialFocus className="p-3 pointer-events-auto" />
               </PopoverContent>
             </Popover>
 
             {hasActiveFilters && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearFilters}
-                className="border-0 shadow-sm"
-              >
+              <Button variant="outline" size="sm" onClick={clearFilters} className="border-0 shadow-sm">
                 <X className="w-4 h-4 mr-2" />
                 Clear
               </Button>
@@ -242,8 +222,7 @@ const Expenses = () => {
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={openAddDialog} className="bg-primary hover:bg-primary/90 shadow-sm">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Expense
+                <Plus className="w-4 h-4 mr-2" /> Add Expense
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
@@ -253,17 +232,15 @@ const Expenses = () => {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="category">Category</Label>
-                  <Select 
-                    value={isEditing ? editingItem?.category : newItem.category} 
-                    onValueChange={(value) => 
-                      isEditing 
-                        ? setEditingItem(prev => prev ? {...prev, category: value} : null)
-                        : setNewItem({...newItem, category: value})
+                  <Select
+                    value={isEditing ? editingItem?.category : newItem.category}
+                    onValueChange={(value) =>
+                      isEditing
+                        ? setEditingItem(prev => prev ? { ...prev, category: value } : null)
+                        : setNewItem({ ...newItem, category: value })
                     }
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                     <SelectContent>
                       {expenseCategories.map(cat => (
                         <SelectItem key={cat} value={cat}>{cat}</SelectItem>
@@ -280,13 +257,31 @@ const Expenses = () => {
                       type="number"
                       placeholder="0.00"
                       value={isEditing ? editingItem?.planned : newItem.planned}
-                      onChange={(e) => 
-                        isEditing 
-                          ? setEditingItem(prev => prev ? {...prev, planned: parseFloat(e.target.value) || 0} : null)
-                          : setNewItem({...newItem, planned: e.target.value})
+                      onChange={(e) =>
+                        isEditing
+                          ? setEditingItem(prev => prev ? { ...prev, planned: parseFloat(e.target.value) || 0 } : null)
+                          : setNewItem({ ...newItem, planned: e.target.value })
                       }
                     />
                   </div>
+                  <div>
+                    <Label htmlFor="account">Account</Label>
+                    <Select
+                      value={isEditing ? editingItem?.account : newItem.account}
+                      onValueChange={(value) =>
+                        isEditing
+                          ? setEditingItem(prev => prev ? { ...prev, account: value } : null)
+                          : setNewItem({ ...newItem, account: value })
+                      }
+                    >
+                      <SelectTrigger><SelectValue placeholder="Select account" /></SelectTrigger>
+                      <SelectContent>
+                        {['Main Account', 'Savings', 'Credit Card', 'Cash'].map(account => (
+                          <SelectItem key={account} value={account}>{account}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+</div>
                   <div>
                     <Label htmlFor="amount">Actual Amount</Label>
                     <Input
@@ -294,10 +289,10 @@ const Expenses = () => {
                       type="number"
                       placeholder="0.00"
                       value={isEditing ? editingItem?.amount : newItem.amount}
-                      onChange={(e) => 
-                        isEditing 
-                          ? setEditingItem(prev => prev ? {...prev, amount: parseFloat(e.target.value) || 0} : null)
-                          : setNewItem({...newItem, amount: e.target.value})
+                      onChange={(e) =>
+                        isEditing
+                          ? setEditingItem(prev => prev ? { ...prev, amount: parseFloat(e.target.value) || 0 } : null)
+                          : setNewItem({ ...newItem, amount: e.target.value })
                       }
                     />
                   </div>
@@ -309,10 +304,10 @@ const Expenses = () => {
                     id="description"
                     placeholder="Expense description"
                     value={isEditing ? editingItem?.description : newItem.description}
-                    onChange={(e) => 
-                      isEditing 
-                        ? setEditingItem(prev => prev ? {...prev, description: e.target.value} : null)
-                        : setNewItem({...newItem, description: e.target.value})
+                    onChange={(e) =>
+                      isEditing
+                        ? setEditingItem(prev => prev ? { ...prev, description: e.target.value } : null)
+                        : setNewItem({ ...newItem, description: e.target.value })
                     }
                   />
                 </div>
@@ -323,18 +318,15 @@ const Expenses = () => {
                     id="date"
                     type="date"
                     value={isEditing ? editingItem?.date : newItem.date}
-                    onChange={(e) => 
-                      isEditing 
-                        ? setEditingItem(prev => prev ? {...prev, date: e.target.value} : null)
-                        : setNewItem({...newItem, date: e.target.value})
+                    onChange={(e) =>
+                      isEditing
+                        ? setEditingItem(prev => prev ? { ...prev, date: e.target.value } : null)
+                        : setNewItem({ ...newItem, date: e.target.value })
                     }
                   />
                 </div>
 
-                <Button 
-                  onClick={isEditing ? handleEditItem : handleAddItem} 
-                  className="w-full"
-                >
+                <Button onClick={isEditing ? handleEditItem : handleAddItem} className="w-full">
                   {isEditing ? 'Update Expense' : 'Add Expense'}
                 </Button>
               </div>
@@ -342,7 +334,7 @@ const Expenses = () => {
           </Dialog>
         </div>
 
-        {/* Expense Items */}
+        {/* Expense Table */}
         <Card className="border-0 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -351,46 +343,55 @@ const Expenses = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {filteredItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-4 border border-border rounded-xl hover:shadow-sm transition-all bg-card">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{item.category}</h3>
-                      <Badge variant="outline" className="text-financial-expense border-financial-expense/20 bg-financial-expense/10">
-                        Expense
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleDateString()}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-financial-expense">${item.amount.toLocaleString()}</p>
-                    <p className="text-sm text-muted-foreground">Planned: ${item.planned.toLocaleString()}</p>
-                    <p className={`text-xs ${item.amount <= item.planned ? 'text-financial-income' : 'text-financial-expense'}`}>
-                      {item.amount <= item.planned ? 'Under' : 'Over'} by ${Math.abs(item.amount - item.planned).toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="flex gap-1 ml-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openEditDialog(item)}
-                      className="text-primary hover:text-primary/80"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteItem(item.id)}
-                      className="text-financial-expense hover:text-financial-expense/80"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-border">
+                <thead>
+                  <tr className="bg-muted/20">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Category</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Account</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Description</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Date</th>
+                    <th className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">Actual</th>
+                    <th className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">Planned</th>
+                    <th className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">Variance</th>
+                    <th className="px-4 py-2 text-center text-xs font-medium text-muted-foreground uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-border">
+                  {filteredItems.map(item => {
+                    const variance = item.planned - item.amount;
+                    const isUnder = item.amount <= item.planned;
+                    return (
+                      <tr key={item.id}>
+                        <td className="px-4 py-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{item.category}</span>
+                            <Badge variant="outline" className="text-financial-expense border-financial-expense/20 bg-financial-expense/10">
+                              Expense
+                            </Badge>
+                          </div>
+                        </td>
+                        <td className="px-4 py-2 text-sm text-muted-foreground">{item.account}</td>
+                        <td className="px-4 py-2 text-sm text-muted-foreground">{item.description}</td>
+                        <td className="px-4 py-2 text-sm text-muted-foreground">{new Date(item.date).toLocaleDateString()}</td>
+                        <td className="px-4 py-2 text-right font-bold text-financial-expense">${item.amount.toLocaleString()}</td>
+                        <td className="px-4 py-2 text-right font-medium text-primary">${item.planned.toLocaleString()}</td>
+                        <td className={`px-4 py-2 text-right text-sm ${isUnder ? 'text-financial-income' : 'text-financial-expense'}`}>
+                          {isUnder ? 'Under' : 'Over'} ${Math.abs(variance).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-2 text-center space-x-2">
+                          <Button variant="ghost" size="sm" onClick={() => openEditDialog(item)} className="text-primary hover:text-primary/80">
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDeleteItem(item.id)} className="text-financial-expense hover:text-financial-expense/80">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </CardContent>
         </Card>

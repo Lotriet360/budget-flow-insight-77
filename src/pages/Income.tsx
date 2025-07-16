@@ -17,6 +17,7 @@ interface IncomeItem {
   id: string;
   category: string;
   amount: number;
+  account: string; // ✅ new
   planned: number;
   description: string;
   date: string;
@@ -30,7 +31,8 @@ const Income = () => {
       amount: 4200,
       planned: 4000,
       description: 'Monthly salary',
-      date: '2024-01-01'
+      date: '2024-01-01',
+      account: ""
     },
     {
       id: '2',
@@ -38,7 +40,8 @@ const Income = () => {
       amount: 800,
       planned: 600,
       description: 'Freelance project',
-      date: '2024-01-10'
+      date: '2024-01-10',
+      account: ""
     }
   ]);
 
@@ -46,6 +49,7 @@ const Income = () => {
   const [newItem, setNewItem] = useState({
     category: '',
     amount: '',
+    account: '',
     planned: '',
     description: '',
     date: new Date().toISOString().split('T')[0]
@@ -63,6 +67,7 @@ const Income = () => {
   };
 
   const hasActiveFilters = dateFrom || dateTo;
+  const accountOptions = ['FNB Cheque', 'Capitec Savings', 'TymeBank', 'Cash', 'Other'];
 
   const handleAddItem = () => {
     if (newItem.category && (newItem.amount || newItem.planned)) {
@@ -72,13 +77,16 @@ const Income = () => {
         amount: parseFloat(newItem.amount) || 0,
         planned: parseFloat(newItem.planned) || 0,
         description: newItem.description,
-        date: newItem.date
+        date: newItem.date,
+        account: newItem.account,
+        
       };
-      
+
       setIncomeItems([...incomeItems, item]);
       setNewItem({
         category: '',
         amount: '',
+        account: '',
         planned: '',
         description: '',
         date: new Date().toISOString().split('T')[0]
@@ -89,7 +97,7 @@ const Income = () => {
 
   const handleEditItem = () => {
     if (editingItem && editingItem.category && (editingItem.amount || editingItem.planned)) {
-      setIncomeItems(incomeItems.map(item => 
+      setIncomeItems(incomeItems.map(item =>
         item.id === editingItem.id ? editingItem : item
       ));
       setEditingItem(null);
@@ -111,6 +119,7 @@ const Income = () => {
     setNewItem({
       category: '',
       amount: '',
+      account: '',
       planned: '',
       description: '',
       date: new Date().toISOString().split('T')[0]
@@ -132,13 +141,12 @@ const Income = () => {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      <PageHeader 
-        title="Income" 
+      <PageHeader
+        title="Income"
         subtitle="Track your planned vs actual income"
       />
-      
+
       <div className="p-6 space-y-6">
-        {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="border-0 shadow-sm">
             <CardHeader className="pb-3">
@@ -173,7 +181,6 @@ const Income = () => {
           </Card>
         </div>
 
-        {/* Date Filters and Add Button */}
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
           <div className="flex gap-2 items-center">
             <Popover>
@@ -251,12 +258,12 @@ const Income = () => {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="category">Category</Label>
-                  <Select 
-                    value={isEditing ? editingItem?.category : newItem.category} 
-                    onValueChange={(value) => 
-                      isEditing 
-                        ? setEditingItem(prev => prev ? {...prev, category: value} : null)
-                        : setNewItem({...newItem, category: value})
+                  <Select
+                    value={isEditing ? editingItem?.category : newItem.category}
+                    onValueChange={(value) =>
+                      isEditing
+                        ? setEditingItem(prev => prev ? { ...prev, category: value } : null)
+                        : setNewItem({ ...newItem, category: value })
                     }
                   >
                     <SelectTrigger>
@@ -270,6 +277,28 @@ const Income = () => {
                   </Select>
                 </div>
 
+                <div>
+                  <Label htmlFor="account">Account</Label>
+                  <Select
+                    value={isEditing ? editingItem?.account : newItem.account}
+                    onValueChange={(value) =>
+                      isEditing
+                        ? setEditingItem(prev => prev ? { ...prev, account: value } : null)
+                        : setNewItem({ ...newItem, account: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {accountOptions.map(account => (
+                        <SelectItem key={account} value={account}>{account}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="planned">Planned Amount</Label>
@@ -278,10 +307,10 @@ const Income = () => {
                       type="number"
                       placeholder="0.00"
                       value={isEditing ? editingItem?.planned : newItem.planned}
-                      onChange={(e) => 
-                        isEditing 
-                          ? setEditingItem(prev => prev ? {...prev, planned: parseFloat(e.target.value) || 0} : null)
-                          : setNewItem({...newItem, planned: e.target.value})
+                      onChange={(e) =>
+                        isEditing
+                          ? setEditingItem(prev => prev ? { ...prev, planned: parseFloat(e.target.value) || 0 } : null)
+                          : setNewItem({ ...newItem, planned: e.target.value })
                       }
                     />
                   </div>
@@ -292,10 +321,10 @@ const Income = () => {
                       type="number"
                       placeholder="0.00"
                       value={isEditing ? editingItem?.amount : newItem.amount}
-                      onChange={(e) => 
-                        isEditing 
-                          ? setEditingItem(prev => prev ? {...prev, amount: parseFloat(e.target.value) || 0} : null)
-                          : setNewItem({...newItem, amount: e.target.value})
+                      onChange={(e) =>
+                        isEditing
+                          ? setEditingItem(prev => prev ? { ...prev, amount: parseFloat(e.target.value) || 0 } : null)
+                          : setNewItem({ ...newItem, amount: e.target.value })
                       }
                     />
                   </div>
@@ -307,10 +336,10 @@ const Income = () => {
                     id="description"
                     placeholder="Income description"
                     value={isEditing ? editingItem?.description : newItem.description}
-                    onChange={(e) => 
-                      isEditing 
-                        ? setEditingItem(prev => prev ? {...prev, description: e.target.value} : null)
-                        : setNewItem({...newItem, description: e.target.value})
+                    onChange={(e) =>
+                      isEditing
+                        ? setEditingItem(prev => prev ? { ...prev, description: e.target.value } : null)
+                        : setNewItem({ ...newItem, description: e.target.value })
                     }
                   />
                 </div>
@@ -321,16 +350,16 @@ const Income = () => {
                     id="date"
                     type="date"
                     value={isEditing ? editingItem?.date : newItem.date}
-                    onChange={(e) => 
-                      isEditing 
-                        ? setEditingItem(prev => prev ? {...prev, date: e.target.value} : null)
-                        : setNewItem({...newItem, date: e.target.value})
+                    onChange={(e) =>
+                      isEditing
+                        ? setEditingItem(prev => prev ? { ...prev, date: e.target.value } : null)
+                        : setNewItem({ ...newItem, date: e.target.value })
                     }
                   />
                 </div>
 
-                <Button 
-                  onClick={isEditing ? handleEditItem : handleAddItem} 
+                <Button
+                  onClick={isEditing ? handleEditItem : handleAddItem}
                   className="w-full"
                 >
                   {isEditing ? 'Update Income' : 'Add Income'}
@@ -340,7 +369,6 @@ const Income = () => {
           </Dialog>
         </div>
 
-        {/* Income Items */}
         <Card className="border-0 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -348,48 +376,74 @@ const Income = () => {
               Income Items
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {filteredItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-4 border border-border rounded-xl hover:shadow-sm transition-all bg-card">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{item.category}</h3>
-                      <Badge variant="outline" className="text-financial-income border-financial-income/20 bg-financial-income/10">
-                        Income
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleDateString()}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-financial-income">${item.amount.toLocaleString()}</p>
-                    <p className="text-sm text-muted-foreground">Planned: ${item.planned.toLocaleString()}</p>
-                    <p className={`text-xs ${item.amount >= item.planned ? 'text-financial-income' : 'text-financial-expense'}`}>
-                      {item.amount >= item.planned ? '+' : ''}${(item.amount - item.planned).toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="flex gap-1 ml-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openEditDialog(item)}
-                      className="text-primary hover:text-primary/80"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteItem(item.id)}
-                      className="text-financial-expense hover:text-financial-expense/80"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <CardContent className="overflow-x-auto p-0">
+            <table className="min-w-full text-sm">
+              <thead className="bg-muted border-b text-muted-foreground text-left">
+                <tr>
+                  <th className="px-4 py-3">Category</th>
+                  <th className="px-4 py-3">Account</th>
+                  <th className="px-4 py-3">Description</th>
+                  <th className="px-4 py-3">Date</th>
+                  <th className="px-4 py-3 text-right">Planned</th>
+                  <th className="px-4 py-3 text-right">Actual</th>
+                  <th className="px-4 py-3 text-right">Variance</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredItems.map((item) => {
+                  const variance = item.amount - item.planned;
+                  const varianceClass = variance >= 0 ? 'text-financial-income' : 'text-financial-expense';
+
+                  return (
+                    <tr key={item.id} className="border-b hover:bg-muted/20 transition-all">
+                      <td className="px-4 py-3 font-medium">
+                        <div className="flex items-center gap-2">
+                          {item.category}
+                          <Badge variant="outline" className="text-financial-income border-financial-income/20 bg-financial-income/10">
+                            Income
+                          </Badge>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">{item.account}</td>
+                      <td className="px-4 py-3">{item.description}</td>
+                      <td className="px-4 py-3">{new Date(item.date).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-right">${item.planned.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-right">${item.amount.toLocaleString()}</td>
+                      <td className={`px-4 py-3 text-right font-medium ${varianceClass}`}>
+                        {variance >= 0 ? '+' : ''}${variance.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openEditDialog(item)}
+                            className="text-primary hover:text-primary/80"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteItem(item.id)}
+                            className="text-financial-expense hover:text-financial-expense/80"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            {filteredItems.length === 0 && (
+              <div className="p-6 text-center text-sm text-muted-foreground">
+                No income items found for the selected period.
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
