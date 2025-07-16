@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, TrendingDown, Calendar, Edit2 } from "lucide-react";
+import { Plus, Trash2, TrendingDown, Calendar, Edit2, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -57,6 +56,13 @@ const Expenses = () => {
   const [dateTo, setDateTo] = useState<Date>();
 
   const expenseCategories = ['Housing', 'Food', 'Transportation', 'Entertainment', 'Utilities', 'Healthcare', 'Shopping', 'Other'];
+
+  const clearFilters = () => {
+    setDateFrom(undefined);
+    setDateTo(undefined);
+  };
+
+  const hasActiveFilters = dateFrom || dateTo;
 
   const handleAddItem = () => {
     if (newItem.category && (newItem.amount || newItem.planned)) {
@@ -122,7 +128,6 @@ const Expenses = () => {
   const totalExpenses = filteredItems.reduce((sum, item) => sum + item.amount, 0);
   const plannedExpenses = filteredItems.reduce((sum, item) => sum + item.planned, 0);
 
-  const currentItem = editingItem || newItem;
   const isEditing = !!editingItem;
 
   return (
@@ -172,7 +177,7 @@ const Expenses = () => {
 
         {/* Date Filters and Add Button */}
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -220,6 +225,18 @@ const Expenses = () => {
                 />
               </PopoverContent>
             </Popover>
+
+            {hasActiveFilters && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearFilters}
+                className="border-0 shadow-sm"
+              >
+                <X className="w-4 h-4 mr-2" />
+                Clear
+              </Button>
+            )}
           </div>
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

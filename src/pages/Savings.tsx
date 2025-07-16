@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, PiggyBank, Calendar, Edit2 } from "lucide-react";
+import { Plus, Trash2, PiggyBank, Calendar, Edit2, X, Target } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -22,6 +22,15 @@ interface SavingsItem {
   target: number;
   description: string;
   date: string;
+}
+
+interface Goal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate: string;
+  description: string;
 }
 
 const Savings = () => {
@@ -46,7 +55,27 @@ const Savings = () => {
     }
   ]);
 
+  const [goals, setGoals] = useState<Goal[]>([
+    {
+      id: '1',
+      name: 'House Down Payment',
+      targetAmount: 50000,
+      currentAmount: 15000,
+      targetDate: '2025-12-31',
+      description: 'Saving for house down payment'
+    },
+    {
+      id: '2',
+      name: 'Vacation Fund',
+      targetAmount: 8000,
+      currentAmount: 3200,
+      targetDate: '2024-08-15',
+      description: 'Europe vacation fund'
+    }
+  ]);
+
   const [editingItem, setEditingItem] = useState<SavingsItem | null>(null);
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [newItem, setNewItem] = useState({
     type: 'savings' as 'savings' | 'investment',
     category: '',
@@ -56,12 +85,28 @@ const Savings = () => {
     date: new Date().toISOString().split('T')[0]
   });
 
+  const [newGoal, setNewGoal] = useState({
+    name: '',
+    targetAmount: '',
+    currentAmount: '',
+    targetDate: new Date().toISOString().split('T')[0],
+    description: ''
+  });
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isGoalDialogOpen, setIsGoalDialogOpen] = useState(false);
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
 
   const savingsCategories = ['Emergency Fund', 'Vacation', 'House Down Payment', 'Car', 'Other'];
   const investmentCategories = ['Stock Market', 'Bonds', 'Real Estate', 'Cryptocurrency', 'Retirement', 'Other'];
+
+  const clearFilters = () => {
+    setDateFrom(undefined);
+    setDateTo(undefined);
+  };
+
+  const hasActiveFilters = dateFrom || dateTo;
 
   const handleAddItem = () => {
     if (newItem.category && newItem.amount && newItem.target) {
@@ -102,6 +147,43 @@ const Savings = () => {
     setSavingsItems(savingsItems.filter(item => item.id !== id));
   };
 
+  const handleAddGoal = () => {
+    if (newGoal.name && newGoal.targetAmount) {
+      const goal: Goal = {
+        id: Date.now().toString(),
+        name: newGoal.name,
+        targetAmount: parseFloat(newGoal.targetAmount),
+        currentAmount: parseFloat(newGoal.currentAmount) || 0,
+        targetDate: newGoal.targetDate,
+        description: newGoal.description
+      };
+      
+      setGoals([...goals, goal]);
+      setNewGoal({
+        name: '',
+        targetAmount: '',
+        currentAmount: '',
+        targetDate: new Date().toISOString().split('T')[0],
+        description: ''
+      });
+      setIsGoalDialogOpen(false);
+    }
+  };
+
+  const handleEditGoal = () => {
+    if (editingGoal && editingGoal.name && editingGoal.targetAmount) {
+      setGoals(goals.map(goal => 
+        goal.id === editingGoal.id ? editingGoal : goal
+      ));
+      setEditingGoal(null);
+      setIsGoalDialogOpen(false);
+    }
+  };
+
+  const handleDeleteGoal = (id: string) => {
+    setGoals(goals.filter(goal => goal.id !== id));
+  };
+
   const openEditDialog = (item: SavingsItem) => {
     setEditingItem(item);
     setIsDialogOpen(true);
@@ -120,6 +202,23 @@ const Savings = () => {
     setIsDialogOpen(true);
   };
 
+  const openEditGoalDialog = (goal: Goal) => {
+    setEditingGoal(goal);
+    setIsGoalDialogOpen(true);
+  };
+
+  const openAddGoalDialog = () => {
+    setEditingGoal(null);
+    setNewGoal({
+      name: '',
+      targetAmount: '',
+      currentAmount: '',
+      targetDate: new Date().toISOString().split('T')[0],
+      description: ''
+    });
+    setIsGoalDialogOpen(true);
+  };
+
   const filteredItems = savingsItems.filter(item => {
     const itemDate = new Date(item.date);
     if (dateFrom && itemDate < dateFrom) return false;
@@ -132,6 +231,7 @@ const Savings = () => {
   const totalTargets = filteredItems.reduce((sum, item) => sum + item.target, 0);
 
   const isEditing = !!editingItem;
+  const isEditingGoal = !!editingGoal;
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -186,7 +286,7 @@ const Savings = () => {
 
         {/* Date Filters and Add Button */}
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -234,130 +334,293 @@ const Savings = () => {
                 />
               </PopoverContent>
             </Popover>
+
+            {hasActiveFilters && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearFilters}
+                className="border-0 shadow-sm"
+              >
+                <X className="w-4 h-4 mr-2" />
+                Clear
+              </Button>
+            )}
           </div>
 
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={openAddDialog} className="bg-primary hover:bg-primary/90 shadow-sm">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Item
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>{isEditing ? 'Edit Savings/Investment' : 'Add New Savings/Investment'}</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="type">Type</Label>
-                  <Select 
-                    value={isEditing ? editingItem?.type : newItem.type} 
-                    onValueChange={(value: 'savings' | 'investment') => 
-                      isEditing 
-                        ? setEditingItem(prev => prev ? {...prev, type: value} : null)
-                        : setNewItem({...newItem, type: value})
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="savings">Savings</SelectItem>
-                      <SelectItem value="investment">Investment</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="category">Category</Label>
-                  <Select 
-                    value={isEditing ? editingItem?.category : newItem.category} 
-                    onValueChange={(value) => 
-                      isEditing 
-                        ? setEditingItem(prev => prev ? {...prev, category: value} : null)
-                        : setNewItem({...newItem, category: value})
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {((isEditing ? editingItem?.type : newItem.type) === 'savings' ? savingsCategories : investmentCategories).map(cat => (
-                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="amount">Current Amount</Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      placeholder="0.00"
-                      value={isEditing ? editingItem?.amount : newItem.amount}
-                      onChange={(e) => 
-                        isEditing 
-                          ? setEditingItem(prev => prev ? {...prev, amount: parseFloat(e.target.value) || 0} : null)
-                          : setNewItem({...newItem, amount: e.target.value})
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="target">Target Amount</Label>
-                    <Input
-                      id="target"
-                      type="number"
-                      placeholder="0.00"
-                      value={isEditing ? editingItem?.target : newItem.target}
-                      onChange={(e) => 
-                        isEditing 
-                          ? setEditingItem(prev => prev ? {...prev, target: parseFloat(e.target.value) || 0} : null)
-                          : setNewItem({...newItem, target: e.target.value})
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Input
-                    id="description"
-                    placeholder="Description"
-                    value={isEditing ? editingItem?.description : newItem.description}
-                    onChange={(e) => 
-                      isEditing 
-                        ? setEditingItem(prev => prev ? {...prev, description: e.target.value} : null)
-                        : setNewItem({...newItem, description: e.target.value})
-                    }
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="date">Date</Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={isEditing ? editingItem?.date : newItem.date}
-                    onChange={(e) => 
-                      isEditing 
-                        ? setEditingItem(prev => prev ? {...prev, date: e.target.value} : null)
-                        : setNewItem({...newItem, date: e.target.value})
-                    }
-                  />
-                </div>
-
-                <Button 
-                  onClick={isEditing ? handleEditItem : handleAddItem} 
-                  className="w-full"
-                >
-                  {isEditing ? 'Update Item' : 'Add Item'}
+          <div className="flex gap-2">
+            <Dialog open={isGoalDialogOpen} onOpenChange={setIsGoalDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={openAddGoalDialog} variant="outline" className="border-0 shadow-sm">
+                  <Target className="w-4 h-4 mr-2" />
+                  Add Goal
                 </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>{isEditingGoal ? 'Edit Goal' : 'Add New Goal'}</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="goalName">Goal Name</Label>
+                    <Input
+                      id="goalName"
+                      placeholder="Goal name"
+                      value={isEditingGoal ? editingGoal?.name : newGoal.name}
+                      onChange={(e) => 
+                        isEditingGoal 
+                          ? setEditingGoal(prev => prev ? {...prev, name: e.target.value} : null)
+                          : setNewGoal({...newGoal, name: e.target.value})
+                      }
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="currentAmount">Current Amount</Label>
+                      <Input
+                        id="currentAmount"
+                        type="number"
+                        placeholder="0.00"
+                        value={isEditingGoal ? editingGoal?.currentAmount : newGoal.currentAmount}
+                        onChange={(e) => 
+                          isEditingGoal 
+                            ? setEditingGoal(prev => prev ? {...prev, currentAmount: parseFloat(e.target.value) || 0} : null)
+                            : setNewGoal({...newGoal, currentAmount: e.target.value})
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="targetAmount">Target Amount</Label>
+                      <Input
+                        id="targetAmount"
+                        type="number"
+                        placeholder="0.00"
+                        value={isEditingGoal ? editingGoal?.targetAmount : newGoal.targetAmount}
+                        onChange={(e) => 
+                          isEditingGoal 
+                            ? setEditingGoal(prev => prev ? {...prev, targetAmount: parseFloat(e.target.value) || 0} : null)
+                            : setNewGoal({...newGoal, targetAmount: e.target.value})
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="targetDate">Target Date</Label>
+                    <Input
+                      id="targetDate"
+                      type="date"
+                      value={isEditingGoal ? editingGoal?.targetDate : newGoal.targetDate}
+                      onChange={(e) => 
+                        isEditingGoal 
+                          ? setEditingGoal(prev => prev ? {...prev, targetDate: e.target.value} : null)
+                          : setNewGoal({...newGoal, targetDate: e.target.value})
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="goalDescription">Description</Label>
+                    <Input
+                      id="goalDescription"
+                      placeholder="Goal description"
+                      value={isEditingGoal ? editingGoal?.description : newGoal.description}
+                      onChange={(e) => 
+                        isEditingGoal 
+                          ? setEditingGoal(prev => prev ? {...prev, description: e.target.value} : null)
+                          : setNewGoal({...newGoal, description: e.target.value})
+                      }
+                    />
+                  </div>
+
+                  <Button 
+                    onClick={isEditingGoal ? handleEditGoal : handleAddGoal} 
+                    className="w-full"
+                  >
+                    {isEditingGoal ? 'Update Goal' : 'Add Goal'}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={openAddDialog} className="bg-primary hover:bg-primary/90 shadow-sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Item
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>{isEditing ? 'Edit Savings/Investment' : 'Add New Savings/Investment'}</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="type">Type</Label>
+                    <Select 
+                      value={isEditing ? editingItem?.type : newItem.type} 
+                      onValueChange={(value: 'savings' | 'investment') => 
+                        isEditing 
+                          ? setEditingItem(prev => prev ? {...prev, type: value} : null)
+                          : setNewItem({...newItem, type: value})
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="savings">Savings</SelectItem>
+                        <SelectItem value="investment">Investment</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="category">Category</Label>
+                    <Select 
+                      value={isEditing ? editingItem?.category : newItem.category} 
+                      onValueChange={(value) => 
+                        isEditing 
+                          ? setEditingItem(prev => prev ? {...prev, category: value} : null)
+                          : setNewItem({...newItem, category: value})
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {((isEditing ? editingItem?.type : newItem.type) === 'savings' ? savingsCategories : investmentCategories).map(cat => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="amount">Current Amount</Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        placeholder="0.00"
+                        value={isEditing ? editingItem?.amount : newItem.amount}
+                        onChange={(e) => 
+                          isEditing 
+                            ? setEditingItem(prev => prev ? {...prev, amount: parseFloat(e.target.value) || 0} : null)
+                            : setNewItem({...newItem, amount: e.target.value})
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="target">Target Amount</Label>
+                      <Input
+                        id="target"
+                        type="number"
+                        placeholder="0.00"
+                        value={isEditing ? editingItem?.target : newItem.target}
+                        onChange={(e) => 
+                          isEditing 
+                            ? setEditingItem(prev => prev ? {...prev, target: parseFloat(e.target.value) || 0} : null)
+                            : setNewItem({...newItem, target: e.target.value})
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="description">Description</Label>
+                    <Input
+                      id="description"
+                      placeholder="Description"
+                      value={isEditing ? editingItem?.description : newItem.description}
+                      onChange={(e) => 
+                        isEditing 
+                          ? setEditingItem(prev => prev ? {...prev, description: e.target.value} : null)
+                          : setNewItem({...newItem, description: e.target.value})
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="date">Date</Label>
+                    <Input
+                      id="date"
+                      type="date"
+                      value={isEditing ? editingItem?.date : newItem.date}
+                      onChange={(e) => 
+                        isEditing 
+                          ? setEditingItem(prev => prev ? {...prev, date: e.target.value} : null)
+                          : setNewItem({...newItem, date: e.target.value})
+                      }
+                    />
+                  </div>
+
+                  <Button 
+                    onClick={isEditing ? handleEditItem : handleAddItem} 
+                    className="w-full"
+                  >
+                    {isEditing ? 'Update Item' : 'Add Item'}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
+
+        {/* Goals Section */}
+        <Card className="border-0 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5 text-financial-savings" />
+              Goals
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {goals.map((goal) => (
+                <div key={goal.id} className="flex items-center justify-between p-4 border border-border rounded-xl hover:shadow-sm transition-all bg-card">
+                  <div className="flex-1">
+                    <h3 className="font-semibold">{goal.name}</h3>
+                    <p className="text-sm text-muted-foreground">{goal.description}</p>
+                    <p className="text-xs text-muted-foreground">Target: {new Date(goal.targetDate).toLocaleDateString()}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-foreground">${goal.currentAmount.toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">of ${goal.targetAmount.toLocaleString()}</p>
+                    <div className="w-32 bg-muted rounded-full h-2 mt-2">
+                      <div 
+                        className="h-2 rounded-full bg-financial-savings"
+                        style={{ width: `${Math.min((goal.currentAmount / goal.targetAmount) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {((goal.currentAmount / goal.targetAmount) * 100).toFixed(1)}% complete
+                    </p>
+                  </div>
+                  <div className="flex gap-1 ml-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEditGoalDialog(goal)}
+                      className="text-primary hover:text-primary/80"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteGoal(goal.id)}
+                      className="text-financial-expense hover:text-financial-expense/80"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Savings & Investment Items */}
         <Card className="border-0 shadow-sm">
