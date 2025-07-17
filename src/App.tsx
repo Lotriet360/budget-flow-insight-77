@@ -10,7 +10,9 @@ import Dashboard from "./pages/Dashboard";
 import Income from "./pages/Income";
 import Expenses from "./pages/Expenses";
 import Savings from "./pages/Savings";
+import Investment from "./pages/Investment";
 import DebtTracker from "./pages/DebtTracker";
+import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 
@@ -32,7 +34,9 @@ const App = () => (
                 <Route path="/income" element={<Income />} />
                 <Route path="/expenses" element={<Expenses />} />
                 <Route path="/savings" element={<Savings />} />
+                <Route path="/investment" element={<Investment />} />
                 <Route path="/debt-tracker" element={<DebtTracker />} />
+                <Route path="/account" element={<Account />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

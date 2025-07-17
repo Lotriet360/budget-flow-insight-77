@@ -5,7 +5,9 @@ import {
   TrendingDown,
   CreditCard, 
   PiggyBank,
-  DollarSign 
+  DollarSign,
+  LineChart,
+  User
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -23,11 +25,13 @@ import {
 } from "@/components/ui/sidebar";
 
 const items = [
-  { title: "Dashboard", url: "/", icon: BarChart3 },
+  { title: "Dashboard", url: "/dashboard", icon: BarChart3 },
   { title: "Income", url: "/income", icon: TrendingUp },
   { title: "Expenses", url: "/expenses", icon: TrendingDown },
-  { title: "Savings & Investment", url: "/savings", icon: PiggyBank },
+  { title: "Savings", url: "/savings", icon: PiggyBank },
+  { title: "Investment", url: "/investment", icon: LineChart },
   { title: "Debt Tracker", url: "/debt-tracker", icon: CreditCard },
+  { title: "Account", url: "/account", icon: User },
 ];
 
 export function AppSidebar() {
