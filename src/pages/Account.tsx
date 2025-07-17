@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +16,7 @@ interface BankAccount {
   balance: number;
   bank: string;
   accountNumber: string;
+  creditLimit?: number;
 }
 
 const Account = () => {
@@ -43,7 +43,8 @@ const Account = () => {
       type: 'credit',
       balance: -1250.75,
       bank: 'American Express',
-      accountNumber: '****2345'
+      accountNumber: '****2345',
+      creditLimit: 5000
     }
   ]);
 
@@ -53,7 +54,8 @@ const Account = () => {
     type: 'checking' as BankAccount['type'],
     balance: '',
     bank: '',
-    accountNumber: ''
+    accountNumber: '',
+    creditLimit: ''
   });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -73,7 +75,8 @@ const Account = () => {
         type: newAccount.type,
         balance: parseFloat(newAccount.balance) || 0,
         bank: newAccount.bank,
-        accountNumber: newAccount.accountNumber
+        accountNumber: newAccount.accountNumber,
+        creditLimit: parseFloat(newAccount.creditLimit || '0') || undefined
       };
       
       setAccounts([...accounts, account]);
@@ -82,7 +85,8 @@ const Account = () => {
         type: 'checking',
         balance: '',
         bank: '',
-        accountNumber: ''
+        accountNumber: '',
+        creditLimit: ''
       });
       setIsDialogOpen(false);
     }
@@ -114,7 +118,8 @@ const Account = () => {
       type: 'checking',
       balance: '',
       bank: '',
-      accountNumber: ''
+      accountNumber: '',
+      creditLimit: ''
     });
     setIsDialogOpen(true);
   };
@@ -139,27 +144,36 @@ const Account = () => {
     }
   };
 
+  const getAvailableBalance = (account: BankAccount) => {
+    if (account.type === 'credit' && account.creditLimit) {
+      return account.creditLimit + account.balance; // balance is negative for credit cards
+    }
+    return account.balance;
+  };
+
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <PageHeader 
         title="Transacting Accounts" 
         subtitle="Manage your bank accounts and cards"
       />
       
-      <div className="p-6 space-y-6">
+      <div className="p-8 space-y-8">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="border-0 shadow-sm">
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-2xl transition-all duration-300">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Balance</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">${totalBalance.toLocaleString()}</div>
+              <div className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                ${totalBalance.toLocaleString()}
+              </div>
               <p className="text-xs text-muted-foreground mt-1">All accounts</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-500/5 to-blue-500/10 hover:shadow-2xl transition-all duration-300">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">Checking</CardTitle>
             </CardHeader>
@@ -169,7 +183,7 @@ const Account = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-financial-savings/5 to-financial-savings/10 hover:shadow-2xl transition-all duration-300">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">Savings</CardTitle>
             </CardHeader>
@@ -179,23 +193,25 @@ const Account = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-financial-expense/5 to-financial-expense/10 hover:shadow-2xl transition-all duration-300">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Credit</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Credit Available</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-expense">${Math.abs(creditBalance).toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">Outstanding debt</p>
+              <div className="text-3xl font-bold text-financial-expense">
+                ${accounts.filter(acc => acc.type === 'credit').reduce((sum, acc) => sum + getAvailableBalance(acc), 0).toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Available credit</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Add Account Button */}
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-foreground">Your Accounts</h2>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Your Accounts</h2>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={openAddDialog} className="bg-primary hover:bg-primary/90 shadow-sm">
+              <Button onClick={openAddDialog} className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Account
               </Button>
@@ -283,6 +299,21 @@ const Account = () => {
                   />
                 </div>
 
+                 <div>
+                  <Label htmlFor="creditLimit">Credit Limit</Label>
+                  <Input
+                    id="creditLimit"
+                    type="number"
+                    placeholder="5000"
+                    value={isEditing ? editingAccount?.creditLimit : newAccount.creditLimit}
+                    onChange={(e) => 
+                      isEditing 
+                        ? setEditingAccount(prev => prev ? {...prev, creditLimit: parseFloat(e.target.value) || 0} : null)
+                        : setNewAccount({...newAccount, creditLimit: e.target.value})
+                    }
+                  />
+                </div>
+
                 <Button 
                   onClick={isEditing ? handleEditAccount : handleAddAccount} 
                   className="w-full"
@@ -295,14 +326,17 @@ const Account = () => {
         </div>
 
         {/* Account Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {accounts.map((account) => (
-            <Card key={account.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-card">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="w-5 h-5 text-primary" />
-                    <Badge variant="outline" className={getAccountTypeColor(account.type)}>
+            <Card key={account.id} className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm transform hover:scale-105 hover:-translate-y-2">
+              <CardHeader className="pb-4 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent"></div>
+                <div className="relative flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-primary/10">
+                      <CreditCard className="w-5 h-5 text-primary" />
+                    </div>
+                    <Badge variant="outline" className={`${getAccountTypeColor(account.type)} font-medium`}>
                       {account.type.charAt(0).toUpperCase() + account.type.slice(1)}
                     </Badge>
                   </div>
@@ -311,7 +345,7 @@ const Account = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => openEditDialog(account)}
-                      className="text-primary hover:text-primary/80 h-8 w-8 p-0"
+                      className="text-primary hover:text-primary/80 h-8 w-8 p-0 hover:bg-primary/10 transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
                     </Button>
@@ -319,32 +353,45 @@ const Account = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteAccount(account.id)}
-                      className="text-financial-expense hover:text-financial-expense/80 h-8 w-8 p-0"
+                      className="text-financial-expense hover:text-financial-expense/80 h-8 w-8 p-0 hover:bg-financial-expense/10 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
-                <CardTitle className="text-lg font-semibold">{account.name}</CardTitle>
+                <CardTitle className="text-xl font-bold relative">{account.name}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Balance</p>
-                    <p className={`text-2xl font-bold ${account.balance >= 0 ? 'text-financial-savings' : 'text-financial-expense'}`}>
-                      ${Math.abs(account.balance).toLocaleString()}
-                    </p>
-                    {account.type === 'credit' && account.balance < 0 && (
-                      <p className="text-xs text-financial-expense">Outstanding debt</p>
+                <div className="space-y-4">
+                  <div className="p-4 rounded-lg bg-gradient-to-r from-muted/50 to-muted/30">
+                    {account.type === 'credit' ? (
+                      <>
+                        <p className="text-sm text-muted-foreground">Available Balance</p>
+                        <p className="text-2xl font-bold text-financial-savings">
+                          ${getAvailableBalance(account).toLocaleString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Used: ${Math.abs(account.balance).toLocaleString()} of ${account.creditLimit?.toLocaleString() || '0'}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-sm text-muted-foreground">Balance</p>
+                        <p className={`text-2xl font-bold ${account.balance >= 0 ? 'text-financial-savings' : 'text-financial-expense'}`}>
+                          ${Math.abs(account.balance).toLocaleString()}
+                        </p>
+                      </>
                     )}
                   </div>
-                  <div className="border-t pt-3">
-                    <p className="text-sm text-muted-foreground">Bank</p>
-                    <p className="font-medium">{account.bank}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Account Number</p>
-                    <p className="font-mono text-sm">{account.accountNumber}</p>
+                  <div className="border-t border-border/50 pt-4 space-y-3">
+                    <div>
+                      <p className="text-sm text-muted-foreground font-medium">Bank</p>
+                      <p className="font-semibold text-foreground">{account.bank}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground font-medium">Account Number</p>
+                      <p className="font-mono text-sm bg-muted/50 px-2 py-1 rounded">{account.accountNumber}</p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -353,14 +400,16 @@ const Account = () => {
         </div>
 
         {accounts.length === 0 && (
-          <Card className="border-0 shadow-sm">
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <CreditCard className="w-12 h-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No accounts added yet</h3>
-              <p className="text-muted-foreground text-center mb-4">
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-muted/20 to-muted/10">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <div className="p-4 rounded-full bg-primary/10 mb-6">
+                <CreditCard className="w-16 h-16 text-primary" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">No accounts added yet</h3>
+              <p className="text-muted-foreground text-center mb-6 max-w-md">
                 Add your first transacting account to get started with tracking your finances.
               </p>
-              <Button onClick={openAddDialog}>
+              <Button onClick={openAddDialog} className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Your First Account
               </Button>
