@@ -7,9 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, CreditCard, Edit2, User, Building, Phone, Mail } from "lucide-react";
+import { Plus, Trash2, CreditCard, Edit2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface BankAccount {
   id: string;
@@ -20,25 +19,7 @@ interface BankAccount {
   accountNumber: string;
 }
 
-interface UserProfile {
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  country: string;
-}
-
 const Account = () => {
-  const [userProfile, setUserProfile] = useState<UserProfile>({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    address: '123 Main Street',
-    city: 'New York',
-    country: 'United States'
-  });
-
   const [accounts, setAccounts] = useState<BankAccount[]>([
     {
       id: '1',
@@ -76,7 +57,6 @@ const Account = () => {
   });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isProfileEditing, setIsProfileEditing] = useState(false);
 
   const accountTypes = [
     { value: 'checking', label: 'Checking Account' },
@@ -162,8 +142,8 @@ const Account = () => {
   return (
     <div className="min-h-screen bg-muted/30">
       <PageHeader 
-        title="Account Management" 
-        subtitle="Manage your profile and bank accounts"
+        title="Transacting Accounts" 
+        subtitle="Manage your bank accounts and cards"
       />
       
       <div className="p-6 space-y-6">
@@ -210,117 +190,9 @@ const Account = () => {
           </Card>
         </div>
 
-        {/* Profile Section */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5 text-primary" />
-              Profile Information
-            </CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsProfileEditing(!isProfileEditing)}
-              className="border-0 shadow-sm"
-            >
-              <Edit2 className="w-4 h-4 mr-2" />
-              {isProfileEditing ? 'Cancel' : 'Edit'}
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-start gap-6">
-              <Avatar className="w-20 h-20">
-                <AvatarImage src="/placeholder.svg" />
-                <AvatarFallback className="text-lg font-semibold">
-                  {userProfile.name.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input
-                    id="name"
-                    value={userProfile.name}
-                    onChange={(e) => setUserProfile({...userProfile, name: e.target.value})}
-                    disabled={!isProfileEditing}
-                    className={!isProfileEditing ? "bg-muted" : ""}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={userProfile.email}
-                    onChange={(e) => setUserProfile({...userProfile, email: e.target.value})}
-                    disabled={!isProfileEditing}
-                    className={!isProfileEditing ? "bg-muted" : ""}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    value={userProfile.phone}
-                    onChange={(e) => setUserProfile({...userProfile, phone: e.target.value})}
-                    disabled={!isProfileEditing}
-                    className={!isProfileEditing ? "bg-muted" : ""}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="address">Address</Label>
-                  <Input
-                    id="address"
-                    value={userProfile.address}
-                    onChange={(e) => setUserProfile({...userProfile, address: e.target.value})}
-                    disabled={!isProfileEditing}
-                    className={!isProfileEditing ? "bg-muted" : ""}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="city">City</Label>
-                  <Input
-                    id="city"
-                    value={userProfile.city}
-                    onChange={(e) => setUserProfile({...userProfile, city: e.target.value})}
-                    disabled={!isProfileEditing}
-                    className={!isProfileEditing ? "bg-muted" : ""}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="country">Country</Label>
-                  <Input
-                    id="country"
-                    value={userProfile.country}
-                    onChange={(e) => setUserProfile({...userProfile, country: e.target.value})}
-                    disabled={!isProfileEditing}
-                    className={!isProfileEditing ? "bg-muted" : ""}
-                  />
-                </div>
-              </div>
-            </div>
-            
-            {isProfileEditing && (
-              <div className="flex gap-2 mt-4">
-                <Button onClick={() => setIsProfileEditing(false)}>
-                  Save Changes
-                </Button>
-                <Button variant="outline" onClick={() => setIsProfileEditing(false)}>
-                  Cancel
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
         {/* Add Account Button */}
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-foreground">Your Accounts</h2>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={openAddDialog} className="bg-primary hover:bg-primary/90 shadow-sm">
@@ -422,42 +294,24 @@ const Account = () => {
           </Dialog>
         </div>
 
-        {/* Bank Accounts */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-primary" />
-              Bank Accounts
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {accounts.map((account) => (
-                <div key={account.id} className="flex items-center justify-between p-4 border border-border rounded-xl hover:shadow-sm transition-all bg-card">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{account.name}</h3>
-                      <Badge variant="outline" className={getAccountTypeColor(account.type)}>
-                        {account.type.charAt(0).toUpperCase() + account.type.slice(1)}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{account.bank}</p>
-                    <p className="text-xs text-muted-foreground">Account: {account.accountNumber}</p>
+        {/* Account Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {accounts.map((account) => (
+            <Card key={account.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-card">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-5 h-5 text-primary" />
+                    <Badge variant="outline" className={getAccountTypeColor(account.type)}>
+                      {account.type.charAt(0).toUpperCase() + account.type.slice(1)}
+                    </Badge>
                   </div>
-                  <div className="text-right">
-                    <p className={`font-bold text-lg ${account.balance >= 0 ? 'text-financial-savings' : 'text-financial-expense'}`}>
-                      ${Math.abs(account.balance).toLocaleString()}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {account.type === 'credit' ? 'Outstanding' : 'Available'}
-                    </p>
-                  </div>
-                  <div className="flex gap-1 ml-2">
+                  <div className="flex gap-1">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => openEditDialog(account)}
-                      className="text-primary hover:text-primary/80"
+                      className="text-primary hover:text-primary/80 h-8 w-8 p-0"
                     >
                       <Edit2 className="w-4 h-4" />
                     </Button>
@@ -465,16 +319,54 @@ const Account = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteAccount(account.id)}
-                      className="text-financial-expense hover:text-financial-expense/80"
+                      className="text-financial-expense hover:text-financial-expense/80 h-8 w-8 p-0"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <CardTitle className="text-lg font-semibold">{account.name}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Balance</p>
+                    <p className={`text-2xl font-bold ${account.balance >= 0 ? 'text-financial-savings' : 'text-financial-expense'}`}>
+                      ${Math.abs(account.balance).toLocaleString()}
+                    </p>
+                    {account.type === 'credit' && account.balance < 0 && (
+                      <p className="text-xs text-financial-expense">Outstanding debt</p>
+                    )}
+                  </div>
+                  <div className="border-t pt-3">
+                    <p className="text-sm text-muted-foreground">Bank</p>
+                    <p className="font-medium">{account.bank}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Account Number</p>
+                    <p className="font-mono text-sm">{account.accountNumber}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {accounts.length === 0 && (
+          <Card className="border-0 shadow-sm">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <CreditCard className="w-12 h-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No accounts added yet</h3>
+              <p className="text-muted-foreground text-center mb-4">
+                Add your first transacting account to get started with tracking your finances.
+              </p>
+              <Button onClick={openAddDialog}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Your First Account
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
