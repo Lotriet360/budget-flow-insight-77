@@ -143,12 +143,12 @@ const Dashboard = () => {
         subtitle="Complete overview of your financial health"
       />
       
-      <div className="p-6 space-y-8">
+      <div className="p-4 space-y-6">
         {/* Header Controls */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="flex items-center gap-3">
             <Select value={dateFilter} onValueChange={setDateFilter}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger className="w-40">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
               <SelectContent>
@@ -160,77 +160,57 @@ const Dashboard = () => {
               </SelectContent>
             </Select>
             <Button variant="outline" size="sm">
-              <Filter className="h-4 w-4 mr-2" />
+              <Filter className="h-3 w-3 mr-1" />
               Filters
             </Button>
           </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setIsDarkMode(!isDarkMode)}
-            >
-              {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </Button>
-            <Button variant="outline" size="sm">
-              <Bell className="h-4 w-4" />
-              <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 text-xs">
-                {alerts.length}
-              </Badge>
-            </Button>
-          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setIsDarkMode(!isDarkMode)}
+          >
+            {isDarkMode ? <Sun className="h-3 w-3" /> : <Moon className="h-3 w-3" />}
+          </Button>
         </div>
 
-        {/* Alerts Section */}
-        {alerts.length > 0 && (
-          <div className="space-y-2">
-            {alerts.slice(0, 3).map((alert, index) => (
-              <Alert key={index} variant={alert.type === 'warning' ? 'destructive' : 'default'}>
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>{alert.message}</AlertDescription>
-              </Alert>
-            ))}
-          </div>
-        )}
-
         {/* 1. Overview / Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Net Worth - Large Card */}
-          <Card className="lg:col-span-2 border-0 shadow-xl bg-gradient-to-br from-primary/20 to-primary/5 hover:shadow-2xl transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="text-lg text-muted-foreground flex items-center gap-2">
-                <Wallet className="h-5 w-5" />
+          <Card className="lg:col-span-2 border-0 shadow-lg bg-gradient-to-br from-primary/20 to-primary/5 hover:shadow-xl transition-all duration-300">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base text-muted-foreground flex items-center gap-2">
+                <Wallet className="h-4 w-4" />
                 Net Worth
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-4xl font-bold text-primary">
+            <CardContent className="pt-0">
+              <div className="space-y-3">
+                <div className="text-3xl font-bold text-primary">
                   ${netWorth.toLocaleString()}
                 </div>
                 <div className="flex items-center gap-2">
                   {netWorthChange > 0 ? (
-                    <ArrowUpRight className="h-4 w-4 text-green-500" />
+                    <ArrowUpRight className="h-3 w-3 text-green-500" />
                   ) : (
-                    <ArrowDownRight className="h-4 w-4 text-red-500" />
+                    <ArrowDownRight className="h-3 w-3 text-red-500" />
                   )}
-                  <span className={netWorthChange > 0 ? 'text-green-500' : 'text-red-500'}>
+                  <span className={`text-xs ${netWorthChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
                     {Math.abs(netWorthChange).toFixed(1)}% vs last month
                   </span>
                 </div>
-                <Progress value={75} className="h-2" />
-                <p className="text-sm text-muted-foreground">75% of annual goal</p>
+                <Progress value={75} className="h-1.5" />
+                <p className="text-xs text-muted-foreground">75% of annual goal</p>
               </div>
             </CardContent>
           </Card>
 
           {/* Income */}
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-green-500/20 to-green-500/5 hover:shadow-2xl transition-all duration-300">
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-green-500/20 to-green-500/5 hover:shadow-xl transition-all duration-300">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Total Income</CardTitle>
+              <CardTitle className="text-xs text-muted-foreground">Total Income</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">${currentMonth.income.toLocaleString()}</div>
+            <CardContent className="pt-0">
+              <div className="text-xl font-bold text-green-600">${currentMonth.income.toLocaleString()}</div>
               <div className="flex items-center gap-1 mt-1">
                 <ArrowUpRight className="h-3 w-3 text-green-500" />
                 <span className="text-xs text-green-500">+5.2%</span>
@@ -239,12 +219,12 @@ const Dashboard = () => {
           </Card>
 
           {/* Expenses */}
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-red-500/20 to-red-500/5 hover:shadow-2xl transition-all duration-300">
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-red-500/20 to-red-500/5 hover:shadow-xl transition-all duration-300">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Total Expenses</CardTitle>
+              <CardTitle className="text-xs text-muted-foreground">Total Expenses</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">${currentMonth.expenses.toLocaleString()}</div>
+            <CardContent className="pt-0">
+              <div className="text-xl font-bold text-red-600">${currentMonth.expenses.toLocaleString()}</div>
               <div className="flex items-center gap-1 mt-1">
                 <ArrowUpRight className="h-3 w-3 text-red-500" />
                 <span className="text-xs text-red-500">+3.1%</span>
@@ -253,12 +233,12 @@ const Dashboard = () => {
           </Card>
 
           {/* Savings Rate */}
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 hover:shadow-2xl transition-all duration-300">
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500/20 to-blue-500/5 hover:shadow-xl transition-all duration-300">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Savings Rate</CardTitle>
+              <CardTitle className="text-xs text-muted-foreground">Savings Rate</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{savingsRate.toFixed(1)}%</div>
+            <CardContent className="pt-0">
+              <div className="text-xl font-bold text-blue-600">{savingsRate.toFixed(1)}%</div>
               <div className="flex items-center gap-1 mt-1">
                 <ArrowUpRight className="h-3 w-3 text-green-500" />
                 <span className="text-xs text-green-500">+2.3%</span>
@@ -268,39 +248,39 @@ const Dashboard = () => {
         </div>
 
         {/* 2. Income & 3. Expense Breakdown */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Income Breakdown */}
-          <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
+          <Card className="border-0 shadow-lg bg-card/80 backdrop-blur-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <BarChart3 className="h-4 w-4" />
                 Income Breakdown
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {incomeBreakdown.map((source) => (
-                  <div key={source.source} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                    <div className="flex items-center gap-3">
+                  <div key={source.source} className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                    <div className="flex items-center gap-2">
                       <div 
-                        className="w-4 h-4 rounded-full" 
+                        className="w-3 h-3 rounded-full" 
                         style={{ backgroundColor: source.color }}
                       />
-                      <span className="font-medium">{source.source}</span>
-                      {source.recurring && <Badge variant="secondary" className="text-xs">Recurring</Badge>}
+                      <span className="font-medium text-sm">{source.source}</span>
+                      {source.recurring && <Badge variant="secondary" className="text-xs h-4">Recurring</Badge>}
                     </div>
-                    <span className="font-semibold">${source.amount.toLocaleString()}</span>
+                    <span className="font-semibold text-sm">${source.amount.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
-              <div className="mt-6">
-                <ResponsiveContainer width="100%" height={200}>
+              <div className="mt-4">
+                <ResponsiveContainer width="100%" height={160}>
                   <LineChart data={monthlyData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
-                    <YAxis stroke="hsl(var(--muted-foreground))" />
+                    <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
                     <Tooltip />
-                    <Line type="monotone" dataKey="income" stroke="#10B981" strokeWidth={3} />
+                    <Line type="monotone" dataKey="income" stroke="#10B981" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -308,24 +288,25 @@ const Dashboard = () => {
           </Card>
 
           {/* Expense Breakdown */}
-          <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <PieChartIcon className="h-5 w-5" />
+          <Card className="border-0 shadow-lg bg-card/80 backdrop-blur-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <PieChartIcon className="h-4 w-4" />
                 Expense Breakdown
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer width="100%" height={180}>
                 <PieChart>
                   <Pie
                     data={expenseCategories}
                     cx="50%"
                     cy="50%"
-                    outerRadius={80}
+                    outerRadius={60}
                     fill="#8884d8"
                     dataKey="amount"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    fontSize={10}
                   >
                     {expenseCategories.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -336,10 +317,10 @@ const Dashboard = () => {
               </ResponsiveContainer>
               
               {/* Top 5 Categories */}
-              <div className="mt-4 space-y-2">
-                <h4 className="font-medium text-sm text-muted-foreground">Top Spending Categories</h4>
+              <div className="mt-3 space-y-1">
+                <h4 className="font-medium text-xs text-muted-foreground">Top Spending Categories</h4>
                 {expenseCategories.slice(0, 5).map((category) => (
-                  <div key={category.name} className="flex items-center justify-between text-sm">
+                  <div key={category.name} className="flex items-center justify-between text-xs">
                     <span>{category.name}</span>
                     <span className="font-semibold">${category.amount}</span>
                   </div>
@@ -350,28 +331,28 @@ const Dashboard = () => {
         </div>
 
         {/* 4. Budget Tracker */}
-        <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
+        <Card className="border-0 shadow-lg bg-card/80 backdrop-blur-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Target className="h-4 w-4" />
               Budget Tracker
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {expenseCategories.map((category) => {
                 const percentage = (category.amount / category.budget) * 100;
                 const isOverBudget = percentage > 100;
                 
                 return (
-                  <div key={category.name} className="space-y-3">
+                  <div key={category.name} className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="font-medium text-sm">{category.name}</span>
-                      {isOverBudget && <AlertTriangle className="h-4 w-4 text-red-500" />}
+                      <span className="font-medium text-xs">{category.name}</span>
+                      {isOverBudget && <AlertTriangle className="h-3 w-3 text-red-500" />}
                     </div>
                     <Progress 
                       value={Math.min(percentage, 100)} 
-                      className="h-2"
+                      className="h-1.5"
                     />
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>${category.amount}</span>
@@ -388,23 +369,23 @@ const Dashboard = () => {
         </Card>
 
         {/* 5. Savings & Goals + 6. Investments */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Savings Goals */}
-          <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <PiggyBank className="h-5 w-5" />
+          <Card className="border-0 shadow-lg bg-card/80 backdrop-blur-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <PiggyBank className="h-4 w-4" />
                 Savings Goals
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-6">
+            <CardContent className="pt-0">
+              <div className="grid grid-cols-2 gap-4">
                 {savingsGoals.map((goal) => {
                   const percentage = (goal.current / goal.target) * 100;
                   
                   return (
-                    <div key={goal.name} className="text-center space-y-3">
-                      <div className="w-20 h-20 mx-auto">
+                    <div key={goal.name} className="text-center space-y-2">
+                      <div className="w-16 h-16 mx-auto">
                         <CircularProgressbar
                           value={percentage}
                           text={`${percentage.toFixed(0)}%`}
@@ -416,7 +397,7 @@ const Dashboard = () => {
                         />
                       </div>
                       <div>
-                        <p className="font-medium text-sm">{goal.name}</p>
+                        <p className="font-medium text-xs">{goal.name}</p>
                         <p className="text-xs text-muted-foreground">
                           ${goal.current.toLocaleString()} / ${goal.target.toLocaleString()}
                         </p>
@@ -427,13 +408,13 @@ const Dashboard = () => {
               </div>
               
               {/* Savings Trend */}
-              <div className="mt-6">
-                <h4 className="font-medium text-sm mb-3">Savings Trend</h4>
-                <ResponsiveContainer width="100%" height={150}>
+              <div className="mt-4">
+                <h4 className="font-medium text-xs mb-2">Savings Trend</h4>
+                <ResponsiveContainer width="100%" height={120}>
                   <AreaChart data={monthlyData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
+                    <XAxis dataKey="month" fontSize={10} />
+                    <YAxis fontSize={10} />
                     <Tooltip />
                     <Area type="monotone" dataKey="savings" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.3} />
                   </AreaChart>
@@ -443,33 +424,33 @@ const Dashboard = () => {
           </Card>
 
           {/* Investments */}
-          <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <LineChartIcon className="h-5 w-5" />
+          <Card className="border-0 shadow-lg bg-card/80 backdrop-blur-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <LineChartIcon className="h-4 w-4" />
                 Investment Portfolio
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="pt-0">
+              <div className="space-y-3">
                 <div className="text-center">
-                  <div className="text-3xl font-bold">${totalInvestments.toLocaleString()}</div>
-                  <div className="text-sm text-green-500 flex items-center justify-center gap-1">
+                  <div className="text-2xl font-bold">${totalInvestments.toLocaleString()}</div>
+                  <div className="text-xs text-green-500 flex items-center justify-center gap-1">
                     <ArrowUpRight className="h-3 w-3" />
                     +8.2% YTD
                   </div>
                 </div>
                 
                 {/* Asset Allocation */}
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm">Asset Allocation</h4>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-xs">Asset Allocation</h4>
                   {investments.map((investment) => (
-                    <div key={investment.type} className="space-y-2">
-                      <div className="flex justify-between text-sm">
+                    <div key={investment.type} className="space-y-1">
+                      <div className="flex justify-between text-xs">
                         <span>{investment.type}</span>
                         <span className="font-medium">{investment.allocation}%</span>
                       </div>
-                      <Progress value={investment.allocation} className="h-2" />
+                      <Progress value={investment.allocation} className="h-1.5" />
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>${investment.value.toLocaleString()}</span>
                         <span className={investment.growth > 0 ? 'text-green-500' : 'text-red-500'}>
@@ -485,33 +466,33 @@ const Dashboard = () => {
         </div>
 
         {/* 7. Debt Overview + 8. Cash Flow */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Debt Overview */}
-          <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
+          <Card className="border-0 shadow-lg bg-card/80 backdrop-blur-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <CreditCard className="h-4 w-4" />
                 Debt Overview
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="pt-0">
+              <div className="space-y-3">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600">${totalDebt.toLocaleString()}</div>
-                  <div className="text-sm text-muted-foreground">Total Outstanding Debt</div>
+                  <div className="text-xl font-bold text-red-600">${totalDebt.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">Total Outstanding Debt</div>
                 </div>
                 
                 {debts.map((debt) => {
                   const progress = ((debt.total - debt.balance) / debt.total) * 100;
                   
                   return (
-                    <div key={debt.name} className="space-y-2 p-4 border rounded-lg">
+                    <div key={debt.name} className="space-y-2 p-3 border rounded-lg">
                       <div className="flex justify-between items-center">
-                        <span className="font-medium">{debt.name}</span>
-                        <Badge variant="outline">{debt.rate}% APR</Badge>
+                        <span className="font-medium text-sm">{debt.name}</span>
+                        <Badge variant="outline" className="text-xs h-4">{debt.rate}% APR</Badge>
                       </div>
-                      <Progress value={progress} className="h-2" />
-                      <div className="flex justify-between text-sm text-muted-foreground">
+                      <Progress value={progress} className="h-1.5" />
+                      <div className="flex justify-between text-xs text-muted-foreground">
                         <span>Paid: ${(debt.total - debt.balance).toLocaleString()}</span>
                         <span>Remaining: ${debt.balance.toLocaleString()}</span>
                       </div>
@@ -527,21 +508,21 @@ const Dashboard = () => {
           </Card>
 
           {/* Cash Flow Forecast */}
-          <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
+          <Card className="border-0 shadow-lg bg-card/80 backdrop-blur-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Calendar className="h-4 w-4" />
                 Cash Flow & Upcoming Bills
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="pt-0">
+              <div className="space-y-3">
                 {/* Cash Flow Chart */}
-                <ResponsiveContainer width="100%" height={200}>
+                <ResponsiveContainer width="100%" height={160}>
                   <ComposedChart data={cashFlowData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
+                    <XAxis dataKey="date" fontSize={10} />
+                    <YAxis fontSize={10} />
                     <Tooltip />
                     <Bar dataKey="income" fill="#10B981" />
                     <Bar dataKey="expenses" fill="#EF4444" />
@@ -551,15 +532,15 @@ const Dashboard = () => {
                 
                 {/* Upcoming Bills */}
                 <div>
-                  <h4 className="font-medium text-sm mb-3">Upcoming Bills</h4>
-                  <div className="space-y-2">
+                  <h4 className="font-medium text-xs mb-2">Upcoming Bills</h4>
+                  <div className="space-y-1">
                     {upcomingBills.map((bill, index) => (
                       <div key={index} className="flex justify-between items-center p-2 rounded bg-muted/30">
                         <div>
-                          <span className="font-medium text-sm">{bill.name}</span>
+                          <span className="font-medium text-xs">{bill.name}</span>
                           <p className="text-xs text-muted-foreground">{bill.date}</p>
                         </div>
-                        <span className="font-semibold">${bill.amount}</span>
+                        <span className="font-semibold text-xs">${bill.amount}</span>
                       </div>
                     ))}
                   </div>
