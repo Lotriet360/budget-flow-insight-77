@@ -137,41 +137,41 @@ const Expenses = () => {
   const isEditing = !!editingItem;
 
     return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-accent/10">
       <PageHeader title="Expenses" subtitle="Track your planned vs actual expenses" />
 
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-8">
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Expenses</CardTitle>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-muted/20">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-financial-expense to-financial-expense/80 bg-clip-text text-transparent">Total Expenses</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-expense">${totalExpenses.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">This period</p>
+              <div className="text-4xl font-bold text-financial-expense">${totalExpenses.toLocaleString()}</div>
+              <p className="text-sm text-muted-foreground mt-2">This period</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Planned Expenses</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-primary/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Planned Expenses</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">${plannedExpenses.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">Budgeted</p>
+              <div className="text-4xl font-bold text-primary">${plannedExpenses.toLocaleString()}</div>
+              <p className="text-sm text-muted-foreground mt-2">Budgeted</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Variance</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-financial-income/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold text-foreground">Variance</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={`text-3xl font-bold ${totalExpenses <= plannedExpenses ? 'text-financial-income' : 'text-financial-expense'}`}>
+              <div className={`text-4xl font-bold ${totalExpenses <= plannedExpenses ? 'text-financial-income' : 'text-financial-expense'}`}>
                 ${(plannedExpenses - totalExpenses).toLocaleString()}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-2">
                 {totalExpenses <= plannedExpenses ? 'Under budget' : 'Over budget'}
               </p>
             </CardContent>
@@ -335,11 +335,11 @@ const Expenses = () => {
         </div>
 
         {/* Expense Table */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingDown className="w-5 h-5 text-financial-expense" />
-              Expense Items
+        <Card className="border-0 shadow-xl bg-gradient-to-br from-card via-card to-muted/20 backdrop-blur-sm">
+          <CardHeader className="pb-6">
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <TrendingDown className="w-6 h-6 text-financial-expense" />
+              <span className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">Expense Items</span>
             </CardTitle>
           </CardHeader>
           <CardContent>

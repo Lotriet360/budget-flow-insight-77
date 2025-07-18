@@ -194,60 +194,60 @@ const DebtTracker = () => {
   const isEditingDebt = !!editingDebt;
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-financial-debt/10">
       <PageHeader 
         title="Debt Tracker" 
         subtitle="Monitor your debts and track payments"
       />
       
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-8">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Debt</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-financial-debt/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-financial-debt to-financial-debt/80 bg-clip-text text-transparent">Total Debt</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-debt">${totalDebt.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <div className="text-4xl font-bold text-financial-debt">${totalDebt.toLocaleString()}</div>
+              <p className="text-sm text-muted-foreground mt-2">
                 Across {debts.length} accounts
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Paid</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-financial-income/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-financial-income to-financial-income/80 bg-clip-text text-transparent">Total Paid</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-income">${totalPaid.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <div className="text-4xl font-bold text-financial-income">${totalPaid.toLocaleString()}</div>
+              <p className="text-sm text-muted-foreground mt-2">
                 {totalOriginalDebt > 0 ? ((totalPaid / totalOriginalDebt) * 100).toFixed(1) : 0}% of original debt
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Min Monthly Payments</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-primary/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Min Monthly Payments</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">${totalMinPayments.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <div className="text-4xl font-bold text-primary">${totalMinPayments.toLocaleString()}</div>
+              <p className="text-sm text-muted-foreground mt-2">
                 Minimum required
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Progress</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-financial-investment/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold text-foreground">Progress</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-investment">
+              <div className="text-4xl font-bold text-financial-investment">
                 {totalOriginalDebt > 0 ? ((totalPaid / totalOriginalDebt) * 100).toFixed(1) : 0}%
               </div>
-              <Progress value={totalOriginalDebt > 0 ? (totalPaid / totalOriginalDebt) * 100 : 0} className="mt-2" />
+              <Progress value={totalOriginalDebt > 0 ? (totalPaid / totalOriginalDebt) * 100 : 0} className="mt-3 h-3" />
             </CardContent>
           </Card>
         </div>
@@ -395,7 +395,7 @@ const DebtTracker = () => {
             const daysUntilDue = getDaysUntilDue(debt.dueDate);
             
             return (
-              <Card key={debt.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
+              <Card key={debt.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] bg-gradient-to-br from-card via-card to-muted/20 backdrop-blur-sm">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{debt.name}</CardTitle>

@@ -224,54 +224,54 @@ const Savings = () => {
   const isEditingGoal = !!editingGoal;
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-financial-savings/10">
       <PageHeader 
         title="Savings" 
         subtitle="Track your savings goals and progress"
       />
       
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-8">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Savings</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-financial-savings/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-financial-savings to-financial-savings/80 bg-clip-text text-transparent">Total Savings</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-savings">${savingsTotal.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">Saved amount</p>
+              <div className="text-4xl font-bold text-financial-savings">${savingsTotal.toLocaleString()}</div>
+              <p className="text-sm text-muted-foreground mt-2">Saved amount</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Savings Targets</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-accent/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent">Savings Targets</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-debt">${totalTargets.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">Target amount</p>
+              <div className="text-4xl font-bold text-accent">${totalTargets.toLocaleString()}</div>
+              <p className="text-sm text-muted-foreground mt-2">Target amount</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Progress</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-primary/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Progress</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">
+              <div className="text-4xl font-bold text-primary">
                 {totalTargets > 0 ? ((savingsTotal / totalTargets) * 100).toFixed(1) : '0'}%
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Target completion</p>
+              <p className="text-sm text-muted-foreground mt-2">Target completion</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Active Goals</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-financial-savings/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold text-foreground">Active Goals</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-savings">{goals.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">Goals set</p>
+              <div className="text-4xl font-bold text-financial-savings">{goals.length}</div>
+              <p className="text-sm text-muted-foreground mt-2">Goals set</p>
             </CardContent>
           </Card>
         </div>

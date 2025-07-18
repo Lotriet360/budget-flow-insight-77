@@ -140,43 +140,43 @@ const Income = () => {
   const isEditing = !!editingItem;
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-financial-income/10">
       <PageHeader
         title="Income"
         subtitle="Track your planned vs actual income"
       />
 
-      <div className="p-6 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Income</CardTitle>
+      <div className="p-6 space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-financial-income/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-financial-income to-financial-income/80 bg-clip-text text-transparent">Total Income</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-income">${totalIncome.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">This period</p>
+              <div className="text-4xl font-bold text-financial-income">${totalIncome.toLocaleString()}</div>
+              <p className="text-sm text-muted-foreground mt-2">This period</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Planned Income</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-primary/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Planned Income</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">${plannedIncome.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">Expected</p>
+              <div className="text-4xl font-bold text-primary">${plannedIncome.toLocaleString()}</div>
+              <p className="text-sm text-muted-foreground mt-2">Expected</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Variance</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-accent/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold text-foreground">Variance</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={`text-3xl font-bold ${totalIncome - plannedIncome >= 0 ? 'text-financial-income' : 'text-financial-expense'}`}>
+              <div className={`text-4xl font-bold ${totalIncome - plannedIncome >= 0 ? 'text-financial-income' : 'text-financial-expense'}`}>
                 ${(totalIncome - plannedIncome).toLocaleString()}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Actual vs Planned</p>
+              <p className="text-sm text-muted-foreground mt-2">Actual vs Planned</p>
             </CardContent>
           </Card>
         </div>
@@ -369,11 +369,11 @@ const Income = () => {
           </Dialog>
         </div>
 
-        <Card className="border-0 shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-financial-income" />
-              Income Items
+        <Card className="border-0 shadow-xl bg-gradient-to-br from-card via-card to-financial-income/10 backdrop-blur-sm">
+          <CardHeader className="pb-6">
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <TrendingUp className="w-6 h-6 text-financial-income" />
+              <span className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">Income Items</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="overflow-x-auto p-0">

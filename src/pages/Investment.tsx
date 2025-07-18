@@ -133,54 +133,54 @@ const Investment = () => {
   const isEditing = !!editingItem;
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/50 to-financial-investment/10">
       <PageHeader 
         title="Investment Portfolio" 
         subtitle="Track and manage your investment portfolio"
       />
       
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-8">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Investments</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-financial-investment/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-financial-investment to-financial-investment/80 bg-clip-text text-transparent">Total Investments</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-investment">${investmentTotal.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">Current value</p>
+              <div className="text-4xl font-bold text-financial-investment">${investmentTotal.toLocaleString()}</div>
+              <p className="text-sm text-muted-foreground mt-2">Current value</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Investment Targets</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-accent/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent">Investment Targets</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-debt">${totalTargets.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">Target value</p>
+              <div className="text-4xl font-bold text-accent">${totalTargets.toLocaleString()}</div>
+              <p className="text-sm text-muted-foreground mt-2">Target value</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Average Investment</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-primary/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Average Investment</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">${averageReturn}</div>
-              <p className="text-xs text-muted-foreground mt-1">Per investment</p>
+              <div className="text-4xl font-bold text-primary">${averageReturn}</div>
+              <p className="text-sm text-muted-foreground mt-2">Per investment</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Progress</CardTitle>
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-card via-card to-financial-savings/10">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold text-foreground">Progress</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-savings">
+              <div className="text-4xl font-bold text-financial-savings">
                 {totalTargets > 0 ? ((investmentTotal / totalTargets) * 100).toFixed(1) : '0'}%
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Target completion</p>
+              <p className="text-sm text-muted-foreground mt-2">Target completion</p>
             </CardContent>
           </Card>
         </div>
@@ -353,17 +353,17 @@ const Investment = () => {
         </div>
 
         {/* Investment Items */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-financial-investment" />
-              Investment Portfolio
+        <Card className="border-0 shadow-xl bg-gradient-to-br from-card via-card to-financial-investment/10 backdrop-blur-sm">
+          <CardHeader className="pb-6">
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <TrendingUp className="w-6 h-6 text-financial-investment" />
+              <span className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">Investment Portfolio</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {filteredItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-4 border border-border rounded-xl hover:shadow-sm transition-all bg-card">
+                <div key={item.id} className="flex items-center justify-between p-6 border border-border/50 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] bg-gradient-to-r from-card via-card to-muted/20 backdrop-blur-sm">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">{item.category}</h3>
