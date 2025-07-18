@@ -1,207 +1,573 @@
 
+import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   DollarSign, 
   TrendingUp, 
   TrendingDown, 
   CreditCard,
   PiggyBank,
-  AlertCircle 
+  AlertCircle,
+  Target,
+  Calendar,
+  Moon,
+  Sun,
+  Bell,
+  Wallet,
+  BarChart3,
+  PieChart as PieChartIcon,
+  LineChart as LineChartIcon,
+  ArrowUpRight,
+  ArrowDownRight,
+  Filter,
+  AlertTriangle
 } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer, 
+  LineChart, 
+  Line, 
+  PieChart, 
+  Pie, 
+  Cell,
+  AreaChart,
+  Area,
+  ComposedChart
+} from 'recharts';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
+// Sample Data
 const monthlyData = [
-  { month: 'Jan', income: 4000, expenses: 3200, savings: 800 },
-  { month: 'Feb', income: 4200, expenses: 3400, savings: 800 },
-  { month: 'Mar', income: 4100, expenses: 3600, savings: 500 },
-  { month: 'Apr', income: 4300, expenses: 3300, savings: 1000 },
-  { month: 'May', income: 4500, expenses: 3500, savings: 1000 },
-  { month: 'Jun', income: 4400, expenses: 3800, savings: 600 },
+  { month: 'Jul', income: 5200, expenses: 4100, savings: 1100, netWorth: 45000 },
+  { month: 'Aug', income: 5400, expenses: 4300, savings: 1100, netWorth: 46100 },
+  { month: 'Sep', income: 5100, expenses: 4200, savings: 900, netWorth: 47000 },
+  { month: 'Oct', income: 5600, expenses: 4400, savings: 1200, netWorth: 48200 },
+  { month: 'Nov', income: 5800, expenses: 4600, savings: 1200, netWorth: 49400 },
+  { month: 'Dec', income: 6000, expenses: 4800, savings: 1200, netWorth: 50600 },
 ];
 
-const expenseBreakdown = [
-  { name: 'Housing', value: 1200, color: '#3B82F6' },
-  { name: 'Food', value: 600, color: '#10B981' },
-  { name: 'Transportation', value: 400, color: '#F59E0B' },
-  { name: 'Entertainment', value: 300, color: '#EF4444' },
-  { name: 'Utilities', value: 200, color: '#8B5CF6' },
-  { name: 'Other', value: 300, color: '#6B7280' },
+const incomeBreakdown = [
+  { source: 'Salary', amount: 4800, color: '#3B82F6', recurring: true },
+  { source: 'Freelance', amount: 800, color: '#10B981', recurring: false },
+  { source: 'Dividends', amount: 300, color: '#F59E0B', recurring: true },
+  { source: 'Other', amount: 100, color: '#8B5CF6', recurring: false },
 ];
 
-const accounts = [
-  { name: 'Checking Account', balance: 2500, type: 'checking' },
-  { name: 'Savings Account', balance: 15000, type: 'savings' },
-  { name: 'Investment Account', balance: 8500, type: 'investment' },
+const expenseCategories = [
+  { name: 'Housing', amount: 1800, budget: 2000, color: '#3B82F6' },
+  { name: 'Food & Dining', amount: 650, budget: 700, color: '#10B981' },
+  { name: 'Transportation', amount: 420, budget: 500, color: '#F59E0B' },
+  { name: 'Entertainment', amount: 280, budget: 250, color: '#EF4444' },
+  { name: 'Utilities', amount: 180, budget: 200, color: '#8B5CF6' },
+  { name: 'Shopping', amount: 340, budget: 300, color: '#EC4899' },
+  { name: 'Healthcare', amount: 120, budget: 150, color: '#06B6D4' },
+  { name: 'Other', amount: 210, budget: 200, color: '#6B7280' },
+];
+
+const savingsGoals = [
+  { name: 'Emergency Fund', current: 12000, target: 15000, color: '#3B82F6' },
+  { name: 'Vacation', current: 3200, target: 5000, color: '#10B981' },
+  { name: 'New Car', current: 8500, target: 25000, color: '#F59E0B' },
+  { name: 'House Down Payment', current: 45000, target: 80000, color: '#8B5CF6' },
+];
+
+const investments = [
+  { type: 'Stocks', value: 28500, allocation: 60, growth: 12.4 },
+  { type: 'Bonds', value: 9500, allocation: 20, growth: 4.2 },
+  { type: 'Real Estate', value: 7125, allocation: 15, growth: 8.1 },
+  { type: 'Crypto', value: 2375, allocation: 5, growth: -15.2 },
+];
+
+const debts = [
+  { name: 'Credit Card', balance: 2400, total: 5000, minPayment: 120, dueDate: '2024-01-15', rate: 18.9 },
+  { name: 'Student Loan', balance: 15600, total: 25000, minPayment: 280, dueDate: '2024-01-08', rate: 4.5 },
+  { name: 'Car Loan', balance: 8200, total: 20000, minPayment: 385, dueDate: '2024-01-20', rate: 3.2 },
+];
+
+const cashFlowData = [
+  { date: 'Week 1', income: 1500, expenses: 1200, net: 300 },
+  { date: 'Week 2', income: 1500, expenses: 1400, net: 100 },
+  { date: 'Week 3', income: 1500, expenses: 1100, net: 400 },
+  { date: 'Week 4', income: 1500, expenses: 1300, net: 200 },
+];
+
+const upcomingBills = [
+  { name: 'Rent', amount: 1800, date: '2024-01-01', category: 'Housing' },
+  { name: 'Credit Card Payment', amount: 120, date: '2024-01-15', category: 'Debt' },
+  { name: 'Internet', amount: 80, date: '2024-01-10', category: 'Utilities' },
+  { name: 'Car Insurance', amount: 150, date: '2024-01-20', category: 'Insurance' },
 ];
 
 const Dashboard = () => {
-  const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
-  const currentMonthIncome = monthlyData[monthlyData.length - 1].income;
-  const currentMonthExpenses = monthlyData[monthlyData.length - 1].expenses;
-  const currentMonthSavings = monthlyData[monthlyData.length - 1].savings;
+  const [dateFilter, setDateFilter] = useState("thisMonth");
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Calculations
+  const currentMonth = monthlyData[monthlyData.length - 1];
+  const previousMonth = monthlyData[monthlyData.length - 2];
+  const netWorth = currentMonth.netWorth;
+  const netWorthChange = ((currentMonth.netWorth - previousMonth.netWorth) / previousMonth.netWorth * 100);
+  const savingsRate = (currentMonth.savings / currentMonth.income * 100);
+  const totalInvestments = investments.reduce((sum, inv) => sum + inv.value, 0);
+  const totalDebt = debts.reduce((sum, debt) => sum + debt.balance, 0);
+  const cashFlow = currentMonth.income - currentMonth.expenses;
+
+  // Alerts
+  const alerts = [
+    ...(expenseCategories.filter(cat => cat.amount > cat.budget).map(cat => ({
+      type: 'warning',
+      message: `Over budget in ${cat.name}: $${cat.amount - cat.budget} over limit`,
+    }))),
+    ...debts.filter(debt => new Date(debt.dueDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)).map(debt => ({
+      type: 'info',
+      message: `${debt.name} payment due ${debt.dueDate}`,
+    })),
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-background">
       <PageHeader 
-        title="Dashboard" 
-        subtitle="Overview of your financial health"
+        title="Financial Dashboard" 
+        subtitle="Complete overview of your financial health"
       />
       
-      <div className="p-8 space-y-8">
-        {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-financial-savings/10 to-financial-savings/5 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Balance</CardTitle>
-              <div className="p-2 rounded-full bg-financial-savings/20">
-                <PiggyBank className="h-5 w-5 text-financial-savings" />
-              </div>
+      <div className="p-6 space-y-8">
+        {/* Header Controls */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center gap-4">
+            <Select value={dateFilter} onValueChange={setDateFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Select period" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="thisMonth">This Month</SelectItem>
+                <SelectItem value="last3Months">Last 3 Months</SelectItem>
+                <SelectItem value="last6Months">Last 6 Months</SelectItem>
+                <SelectItem value="thisYear">This Year</SelectItem>
+                <SelectItem value="custom">Custom Range</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setIsDarkMode(!isDarkMode)}
+            >
+              {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+            <Button variant="outline" size="sm">
+              <Bell className="h-4 w-4" />
+              <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 text-xs">
+                {alerts.length}
+              </Badge>
+            </Button>
+          </div>
+        </div>
+
+        {/* Alerts Section */}
+        {alerts.length > 0 && (
+          <div className="space-y-2">
+            {alerts.slice(0, 3).map((alert, index) => (
+              <Alert key={index} variant={alert.type === 'warning' ? 'destructive' : 'default'}>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>{alert.message}</AlertDescription>
+              </Alert>
+            ))}
+          </div>
+        )}
+
+        {/* 1. Overview / Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          {/* Net Worth - Large Card */}
+          <Card className="lg:col-span-2 border-0 shadow-xl bg-gradient-to-br from-primary/20 to-primary/5 hover:shadow-2xl transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="text-lg text-muted-foreground flex items-center gap-2">
+                <Wallet className="h-5 w-5" />
+                Net Worth
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold bg-gradient-to-r from-financial-savings to-financial-savings/80 bg-clip-text text-transparent">
-                ${totalBalance.toLocaleString()}
+              <div className="space-y-4">
+                <div className="text-4xl font-bold text-primary">
+                  ${netWorth.toLocaleString()}
+                </div>
+                <div className="flex items-center gap-2">
+                  {netWorthChange > 0 ? (
+                    <ArrowUpRight className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <ArrowDownRight className="h-4 w-4 text-red-500" />
+                  )}
+                  <span className={netWorthChange > 0 ? 'text-green-500' : 'text-red-500'}>
+                    {Math.abs(netWorthChange).toFixed(1)}% vs last month
+                  </span>
+                </div>
+                <Progress value={75} className="h-2" />
+                <p className="text-sm text-muted-foreground">75% of annual goal</p>
               </div>
-              <p className="text-xs text-financial-savings font-medium mt-1">
-                +2.5% from last month
-              </p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-financial-income/10 to-financial-income/5 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">This Month Income</CardTitle>
-              <div className="p-2 rounded-full bg-financial-income/20">
-                <TrendingUp className="h-5 w-5 text-financial-income" />
-              </div>
+          {/* Income */}
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-green-500/20 to-green-500/5 hover:shadow-2xl transition-all duration-300">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-muted-foreground">Total Income</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-income">${currentMonthIncome.toLocaleString()}</div>
-              <p className="text-xs text-financial-income font-medium mt-1">
-                +5.2% from last month
-              </p>
+              <div className="text-2xl font-bold text-green-600">${currentMonth.income.toLocaleString()}</div>
+              <div className="flex items-center gap-1 mt-1">
+                <ArrowUpRight className="h-3 w-3 text-green-500" />
+                <span className="text-xs text-green-500">+5.2%</span>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-financial-expense/10 to-financial-expense/5 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">This Month Expenses</CardTitle>
-              <div className="p-2 rounded-full bg-financial-expense/20">
-                <TrendingDown className="h-5 w-5 text-financial-expense" />
-              </div>
+          {/* Expenses */}
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-red-500/20 to-red-500/5 hover:shadow-2xl transition-all duration-300">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-muted-foreground">Total Expenses</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-financial-expense">${currentMonthExpenses.toLocaleString()}</div>
-              <p className="text-xs text-financial-expense font-medium mt-1">
-                +8.1% from last month
-              </p>
+              <div className="text-2xl font-bold text-red-600">${currentMonth.expenses.toLocaleString()}</div>
+              <div className="flex items-center gap-1 mt-1">
+                <ArrowUpRight className="h-3 w-3 text-red-500" />
+                <span className="text-xs text-red-500">+3.1%</span>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-primary/10 to-primary/5 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Savings This Month</CardTitle>
-              <div className="p-2 rounded-full bg-primary/20">
-                <DollarSign className="h-5 w-5 text-primary" />
-              </div>
+          {/* Savings Rate */}
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 hover:shadow-2xl transition-all duration-300">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-muted-foreground">Savings Rate</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">${currentMonthSavings.toLocaleString()}</div>
-              <p className="text-xs text-primary font-medium mt-1">
-                {((currentMonthSavings / currentMonthIncome) * 100).toFixed(1)}% savings rate
-              </p>
+              <div className="text-2xl font-bold text-blue-600">{savingsRate.toFixed(1)}%</div>
+              <div className="flex items-center gap-1 mt-1">
+                <ArrowUpRight className="h-3 w-3 text-green-500" />
+                <span className="text-xs text-green-500">+2.3%</span>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Charts Section */}
+        {/* 2. Income & 3. Expense Breakdown */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Monthly Overview */}
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-card to-card/80 backdrop-blur-sm">
+          {/* Income Breakdown */}
+          <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Monthly Overview</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Income Breakdown
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))', 
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
-                    }} 
-                  />
-                  <Bar dataKey="income" fill="hsl(var(--income))" name="Income" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="expenses" fill="hsl(var(--expense))" name="Expenses" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="savings" fill="hsl(var(--savings))" name="Savings" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="space-y-4">
+                {incomeBreakdown.map((source) => (
+                  <div key={source.source} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="w-4 h-4 rounded-full" 
+                        style={{ backgroundColor: source.color }}
+                      />
+                      <span className="font-medium">{source.source}</span>
+                      {source.recurring && <Badge variant="secondary" className="text-xs">Recurring</Badge>}
+                    </div>
+                    <span className="font-semibold">${source.amount.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6">
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                    <YAxis stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="income" stroke="#10B981" strokeWidth={3} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
 
           {/* Expense Breakdown */}
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-card to-card/80 backdrop-blur-sm">
+          <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Expense Breakdown</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <PieChartIcon className="h-5 w-5" />
+                Expense Breakdown
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
-                    data={expenseBreakdown}
+                    data={expenseCategories}
                     cx="50%"
                     cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     outerRadius={80}
                     fill="#8884d8"
-                    dataKey="value"
+                    dataKey="amount"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
-                    {expenseBreakdown.map((entry, index) => (
+                    {expenseCategories.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))', 
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
-                    }} 
-                  />
+                  <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
+              
+              {/* Top 5 Categories */}
+              <div className="mt-4 space-y-2">
+                <h4 className="font-medium text-sm text-muted-foreground">Top Spending Categories</h4>
+                {expenseCategories.slice(0, 5).map((category) => (
+                  <div key={category.name} className="flex items-center justify-between text-sm">
+                    <span>{category.name}</span>
+                    <span className="font-semibold">${category.amount}</span>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Accounts Overview */}
-        <Card className="border-0 shadow-xl bg-gradient-to-br from-card to-card/80 backdrop-blur-sm">
+        {/* 4. Budget Tracker */}
+        <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Accounts</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Budget Tracker
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {accounts.map((account) => (
-                <div key={account.name} className="p-6 border rounded-xl hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-muted/30 to-muted/10 transform hover:scale-105">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-foreground text-lg">{account.name}</p>
-                      <p className="text-sm text-muted-foreground capitalize">{account.type}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {expenseCategories.map((category) => {
+                const percentage = (category.amount / category.budget) * 100;
+                const isOverBudget = percentage > 100;
+                
+                return (
+                  <div key={category.name} className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-sm">{category.name}</span>
+                      {isOverBudget && <AlertTriangle className="h-4 w-4 text-red-500" />}
                     </div>
-                    <div className="text-right">
-                      <p className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                        ${account.balance.toLocaleString()}
-                      </p>
+                    <Progress 
+                      value={Math.min(percentage, 100)} 
+                      className="h-2"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>${category.amount}</span>
+                      <span>${category.budget}</span>
+                    </div>
+                    <div className={`text-xs font-medium ${isOverBudget ? 'text-red-500' : 'text-green-500'}`}>
+                      {isOverBudget ? `${(percentage - 100).toFixed(1)}% over` : `${(100 - percentage).toFixed(1)}% remaining`}
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
+
+        {/* 5. Savings & Goals + 6. Investments */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Savings Goals */}
+          <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <PiggyBank className="h-5 w-5" />
+                Savings Goals
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-6">
+                {savingsGoals.map((goal) => {
+                  const percentage = (goal.current / goal.target) * 100;
+                  
+                  return (
+                    <div key={goal.name} className="text-center space-y-3">
+                      <div className="w-20 h-20 mx-auto">
+                        <CircularProgressbar
+                          value={percentage}
+                          text={`${percentage.toFixed(0)}%`}
+                          styles={buildStyles({
+                            pathColor: goal.color,
+                            textColor: goal.color,
+                            trailColor: '#f3f4f6',
+                          })}
+                        />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">{goal.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          ${goal.current.toLocaleString()} / ${goal.target.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Savings Trend */}
+              <div className="mt-6">
+                <h4 className="font-medium text-sm mb-3">Savings Trend</h4>
+                <ResponsiveContainer width="100%" height={150}>
+                  <AreaChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Area type="monotone" dataKey="savings" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.3} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Investments */}
+          <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <LineChartIcon className="h-5 w-5" />
+                Investment Portfolio
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="text-3xl font-bold">${totalInvestments.toLocaleString()}</div>
+                  <div className="text-sm text-green-500 flex items-center justify-center gap-1">
+                    <ArrowUpRight className="h-3 w-3" />
+                    +8.2% YTD
+                  </div>
+                </div>
+                
+                {/* Asset Allocation */}
+                <div className="space-y-3">
+                  <h4 className="font-medium text-sm">Asset Allocation</h4>
+                  {investments.map((investment) => (
+                    <div key={investment.type} className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>{investment.type}</span>
+                        <span className="font-medium">{investment.allocation}%</span>
+                      </div>
+                      <Progress value={investment.allocation} className="h-2" />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>${investment.value.toLocaleString()}</span>
+                        <span className={investment.growth > 0 ? 'text-green-500' : 'text-red-500'}>
+                          {investment.growth > 0 ? '+' : ''}{investment.growth}%
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 7. Debt Overview + 8. Cash Flow */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Debt Overview */}
+          <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Debt Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-red-600">${totalDebt.toLocaleString()}</div>
+                  <div className="text-sm text-muted-foreground">Total Outstanding Debt</div>
+                </div>
+                
+                {debts.map((debt) => {
+                  const progress = ((debt.total - debt.balance) / debt.total) * 100;
+                  
+                  return (
+                    <div key={debt.name} className="space-y-2 p-4 border rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">{debt.name}</span>
+                        <Badge variant="outline">{debt.rate}% APR</Badge>
+                      </div>
+                      <Progress value={progress} className="h-2" />
+                      <div className="flex justify-between text-sm text-muted-foreground">
+                        <span>Paid: ${(debt.total - debt.balance).toLocaleString()}</span>
+                        <span>Remaining: ${debt.balance.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span>Min Payment: ${debt.minPayment}</span>
+                        <span>Due: {debt.dueDate}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Cash Flow Forecast */}
+          <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Cash Flow & Upcoming Bills
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Cash Flow Chart */}
+                <ResponsiveContainer width="100%" height={200}>
+                  <ComposedChart data={cashFlowData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="income" fill="#10B981" />
+                    <Bar dataKey="expenses" fill="#EF4444" />
+                    <Line type="monotone" dataKey="net" stroke="#3B82F6" strokeWidth={2} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+                
+                {/* Upcoming Bills */}
+                <div>
+                  <h4 className="font-medium text-sm mb-3">Upcoming Bills</h4>
+                  <div className="space-y-2">
+                    {upcomingBills.map((bill, index) => (
+                      <div key={index} className="flex justify-between items-center p-2 rounded bg-muted/30">
+                        <div>
+                          <span className="font-medium text-sm">{bill.name}</span>
+                          <p className="text-xs text-muted-foreground">{bill.date}</p>
+                        </div>
+                        <span className="font-semibold">${bill.amount}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
