@@ -58,16 +58,18 @@ const Income = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
+  const [selectedAccount, setSelectedAccount] = useState<string>('all');
 
   const incomeCategories = ['Salary', 'Freelance', 'Investment', 'Business', 'Other'];
+  const accountOptions = ['FNB Cheque', 'Capitec Savings', 'TymeBank', 'Cash', 'Other'];
 
   const clearFilters = () => {
     setDateFrom(undefined);
     setDateTo(undefined);
+    setSelectedAccount('all');
   };
 
-  const hasActiveFilters = dateFrom || dateTo;
-  const accountOptions = ['FNB Cheque', 'Capitec Savings', 'TymeBank', 'Cash', 'Other'];
+  const hasActiveFilters = dateFrom || dateTo || selectedAccount !== 'all';
 
   const handleAddItem = () => {
     if (newItem.category && (newItem.amount || newItem.planned)) {
@@ -131,6 +133,7 @@ const Income = () => {
     const itemDate = new Date(item.date);
     if (dateFrom && itemDate < dateFrom) return false;
     if (dateTo && itemDate > dateTo) return false;
+    if (selectedAccount !== 'all' && item.account !== selectedAccount) return false;
     return true;
   });
 
@@ -182,7 +185,19 @@ const Income = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center flex-wrap">
+            <Select value={selectedAccount} onValueChange={setSelectedAccount}>
+              <SelectTrigger className="w-[200px] border-0 shadow-sm">
+                <SelectValue placeholder="All Accounts" />
+              </SelectTrigger>
+              <SelectContent className="z-50 bg-popover border border-border shadow-xl">
+                <SelectItem value="all">All Accounts</SelectItem>
+                {accountOptions.map(account => (
+                  <SelectItem key={account} value={account}>{account}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -196,7 +211,7 @@ const Income = () => {
                   {dateFrom ? format(dateFrom, "PPP") : <span>From date</span>}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 z-50 bg-popover border border-border shadow-xl" align="start">
                 <CalendarComponent
                   mode="single"
                   selected={dateFrom}
@@ -220,7 +235,7 @@ const Income = () => {
                   {dateTo ? format(dateTo, "PPP") : <span>To date</span>}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 z-50 bg-popover border border-border shadow-xl" align="start">
                 <CalendarComponent
                   mode="single"
                   selected={dateTo}
@@ -290,7 +305,7 @@ const Income = () => {
                     <SelectTrigger>
                       <SelectValue placeholder="Select account" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-50 bg-popover border border-border shadow-xl">
                       {accountOptions.map(account => (
                         <SelectItem key={account} value={account}>{account}</SelectItem>
                       ))}
