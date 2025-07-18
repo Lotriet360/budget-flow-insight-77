@@ -7,7 +7,10 @@ import {
   PiggyBank,
   DollarSign,
   LineChart,
-  User
+  User,
+  LogOut,
+  Settings,
+  Menu
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -19,9 +22,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
   SidebarHeader,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 
 const items = [
@@ -41,36 +44,35 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive ? "bg-blue-100 text-blue-700 font-medium border-r-2 border-blue-500" : "hover:bg-gray-100 text-gray-700";
+    isActive ? "bg-primary/20 text-primary font-medium rounded-lg mx-2" : "hover:bg-muted rounded-lg mx-2 text-muted-foreground hover:text-foreground";
 
   const collapsed = state === "collapsed";
 
+  const handleLogout = () => {
+    // Add logout logic here
+    console.log("Logout clicked");
+  };
+
   return (
     <Sidebar
-      className={`${collapsed ? "w-16" : "w-64"} border-r border-gray-200 bg-white`}
+      className={`${collapsed ? "w-16" : "w-64"} bg-background border-r border-border`}
       collapsible="icon"
     >
-      <SidebarHeader className="p-4 border-b border-gray-200">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <DollarSign className="w-5 h-5 text-white" />
-          </div>
+      <SidebarHeader className="p-4 border-b border-border">
+        <div className="flex items-center gap-3">
+          <Menu className="w-5 h-5 text-muted-foreground" />
           {!collapsed && (
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">BudgetApp</h2>
-              <p className="text-xs text-gray-500">Financial Management</p>
+              <h2 className="text-lg font-semibold text-foreground">BudgetApp</h2>
             </div>
           )}
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="flex flex-col justify-between h-full">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-gray-500 font-medium">
-            {!collapsed && "Navigation"}
-          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-1 px-2 pt-4">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
@@ -79,8 +81,8 @@ export function AppSidebar() {
                       end 
                       className={getNavCls}
                     >
-                      <item.icon className="h-5 w-5" />
-                      {!collapsed && <span>{item.title}</span>}
+                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      {!collapsed && <span className="ml-3">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -89,6 +91,28 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="p-2 border-t border-border">
+        <SidebarMenu className="space-y-1">
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <NavLink 
+                to="/settings" 
+                className="hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground"
+              >
+                <Settings className="h-5 w-5 flex-shrink-0" />
+                {!collapsed && <span className="ml-3">Settings</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleLogout}>
+              <LogOut className="h-5 w-5 flex-shrink-0" />
+              {!collapsed && <span className="ml-3">Logout</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
